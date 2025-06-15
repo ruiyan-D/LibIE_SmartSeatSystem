@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>座位占用状态</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+        #seat-grid {
+            display: flex;
+            flex-direction: column-reverse; /* 从下往上渲染 */
+            gap: 10px;
+        }
+        .seat-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .seat {
+            width: 60px;
+            height: 60px;
+            text-align: center;
+            line-height: 60px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+        }
+        .occupied {
+            background-color: red;
+        }
+        .item_only {
+            background-color: orange;
+        }
+        .empty {
+            background-color: green;
+        }
+        #stage {
+            width: 100%;
+            text-align: center;
+            margin-top: 20px;
+        }
+        #stage-icon {
+            display: inline-block;
+            width: 100px;
+            height: 60px;
+            background-color: blue;
+            border-radius: 10px;
+            color: white;
+            line-height: 60px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h2>实时座位占用状态</h2>
+    <div id="seat-grid"></div>
+    <div id="stage">
+        <div id="stage-icon">讲台</div>
+    </div>
+
+    <script>
+        async function fetchSeatStatus() {
+            const response = await fetch('/api/seat_status');
+            const data = await response.json();
+
+            const seatGrid = document.getElementById('seat-grid');
+            seatGrid.innerHTML = '';
+
+            data.forEach((row, rowIndex) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'seat-row';
+
+                row.forEach(seat => {
+                    const seatDiv = document.createElement('div');
+                    seatDiv.className = `seat ${seat[2]}`;
+                    seatDiv.textContent = seat[0];
+                    seatDiv.onclick = () => alert(`座位编号: ${seat[0]}\n状态: ${seat[2]}\n坐标: ${seat[1]}`);
+                    rowDiv.appendChild(seatDiv);
+                });
+
+                seatGrid.appendChild(rowDiv);
+            });
+        }
+
+        setInterval(fetchSeatStatus, 500);
+    </script>
+</body>
+</html>

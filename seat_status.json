@@ -1,0 +1,20 @@
+{
+    "seat_0": {
+        "coords": [
+            95,
+            105,
+            260,
+            370
+        ],
+        "status": "occupied"
+    },
+    "seat_1": {
+        "coords": [
+            361,
+            108,
+            516,
+            373
+        ],
+        "status": "occupied"
+    }
+}
