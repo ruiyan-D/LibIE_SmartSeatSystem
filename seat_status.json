@@ -1,20 +1,116 @@
 {
-    "seat_0": {
-        "coords": [
-            95,
-            105,
-            260,
-            370
-        ],
-        "status": "occupied"
+    "camera_0": {
+        "seat_0": {
+            "coords": [
+                155,
+                94,
+                318,
+                243
+            ],
+            "status": "occupied"
+        },
+        "seat_1": {
+            "coords": [
+                414,
+                183,
+                542,
+                333
+            ],
+            "status": "occupied"
+        },
+        "seat_2": {
+            "coords": [
+                185,
+                338,
+                369,
+                451
+            ],
+            "status": "occupied"
+        }
     },
-    "seat_1": {
-        "coords": [
-            361,
-            108,
-            516,
-            373
-        ],
-        "status": "occupied"
+    "camera_1": {
+        "seat_0": {
+            "coords": [
+                75,
+                78,
+                172,
+                147
+            ],
+            "status": "occupied"
+        },
+        "seat_1": {
+            "coords": [
+                247,
+                95,
+                407,
+                179
+            ],
+            "status": "empty"
+        },
+        "seat_2": {
+            "coords": [
+                454,
+                127,
+                533,
+                249
+            ],
+            "status": "occupied"
+        },
+        "seat_3": {
+            "coords": [
+                258,
+                299,
+                388,
+                406
+            ],
+            "status": "occupied"
+        },
+        "seat_4": {
+            "coords": [
+                109,
+                277,
+                228,
+                417
+            ],
+            "status": "occupied"
+        }
+    },
+    "camera_2": {
+        "seat_0": {
+            "coords": [
+                91,
+                99,
+                205,
+                239
+            ],
+            "status": "occupied"
+        },
+        "seat_1": {
+            "coords": [
+                282,
+                148,
+                380,
+                366
+            ],
+            "status": "occupied"
+        },
+        "seat_2": {
+            "coords": [
+                142,
+                330,
+                270,
+                490
+            ],
+            "status": "occupied"
+        },
+        "seat_3": {
+            "coords": [
+                471,
+                416,
+                471,
+                416
+            ],
+            "status": "occupied"
+        }
     }
 }
