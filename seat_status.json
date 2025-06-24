@@ -1,215 +1,143 @@
 {
     "camera_0": {
-        "seat_0": {
-            "coords": [
-                70,
-                159,
-                129,
-                221
-            ],
-            "status": "empty"
-        },
-        "seat_1": {
-            "coords": [
-                172,
-                160,
-                237,
-                221
-            ],
-            "status": "empty"
-        },
-        "seat_2": {
-            "coords": [
-                270,
-                161,
-                328,
-                219
-            ],
-            "status": "occupied"
-        },
-        "seat_3": {
-            "coords": [
-                366,
-                162,
-                428,
-                215
-            ],
-            "status": "occupied"
-        },
-        "seat_4": {
-            "coords": [
-                466,
-                166,
-                544,
-                222
-            ],
-            "status": "occupied"
-        }
+        "1": [
+            {
+                "coords": [
+                    61,
+                    96,
+                    127,
+                    180
+                ],
+                "status": "empty"
+            },
+            {
+                "coords": [
+                    175,
+                    92,
+                    236,
+                    169
+                ],
+                "status": "item_only"
+            }
+        ],
+        "2": [
+            {
+                "coords": [
+                    276,
+                    92,
+                    326,
+                    180
+                ],
+                "status": "item_only"
+            },
+            {
+                "coords": [
+                    80,
+                    202,
+                    133,
+                    268
+                ],
+                "status": "empty"
+            },
+            {
+                "coords": [
+                    316,
+                    214,
+                    364,
+                    311
+                ],
+                "status": "item_only"
+            }
+        ],
+        "3": [
+            {
+                "coords": [
+                    207,
+                    206,
+                    249,
+                    287
+                ],
+                "status": "item_only"
+            }
+        ]
     },
     "camera_1": {
-        "seat_0": {
-            "coords": [
-                84,
-                96,
-                139,
-                184
-            ],
-            "status": "empty"
-        },
-        "seat_1": {
-            "coords": [
-                181,
-                118,
-                181,
-                118
-            ],
-            "status": "empty"
-        },
-        "seat_2": {
-            "coords": [
-                181,
-                118,
-                181,
-                118
-            ],
-            "status": "empty"
-        },
-        "seat_3": {
-            "coords": [
-                200,
-                101,
-                270,
-                184
-            ],
-            "status": "empty"
-        },
-        "seat_4": {
-            "coords": [
-                328,
-                96,
-                404,
-                189
-            ],
-            "status": "item_only"
-        },
-        "seat_5": {
-            "coords": [
-                460,
-                96,
-                524,
-                185
-            ],
-            "status": "item_only"
-        },
-        "seat_6": {
-            "coords": [
-                92,
-                240,
-                139,
-                320
-            ],
-            "status": "empty"
-        },
-        "seat_7": {
-            "coords": [
-                208,
-                229,
-                256,
-                316
-            ],
-            "status": "empty"
-        },
-        "seat_8": {
-            "coords": [
-                343,
-                232,
-                401,
-                312
-            ],
-            "status": "occupied"
-        },
-        "seat_9": {
-            "coords": [
-                468,
-                239,
-                532,
-                316
-            ],
-            "status": "occupied"
-        }
+        "1": [
+            {
+                "coords": [
+                    136,
+                    88,
+                    201,
+                    196
+                ],
+                "status": "item_only"
+            },
+            {
+                "coords": [
+                    299,
+                    100,
+                    364,
+                    218
+                ],
+                "status": "item_only"
+            }
+        ],
+        "2": [
+            {
+                "coords": [
+                    432,
+                    96,
+                    508,
+                    197
+                ],
+                "status": "occupied"
+            }
+        ]
     },
     "camera_2": {
-        "seat_0": {
-            "coords": [
-                48,
-                315,
-                121,
-                398
-            ],
-            "status": "occupied"
-        },
-        "seat_1": {
-            "coords": [
-                192,
-                324,
-                256,
-                406
-            ],
-            "status": "occupied"
-        },
-        "seat_2": {
-            "coords": [
-                332,
-                330,
-                384,
-                408
-            ],
-            "status": "occupied"
-        },
-        "seat_3": {
-            "coords": [
-                460,
-                324,
-                514,
-                408
-            ],
-            "status": "occupied"
-        },
-        "seat_4": {
-            "coords": [
-                120,
-                156,
-                203,
-                240
-            ],
-            "status": "occupied"
-        },
-        "seat_5": {
-            "coords": [
-                270,
-                163,
-                332,
-                243
-            ],
-            "status": "occupied"
-        },
-        "seat_6": {
-            "coords": [
-                424,
-                153,
-                472,
-                226
-            ],
-            "status": "occupied"
-        },
-        "seat_7": {
-            "coords": [
-                224,
-                62,
-                264,
-                104
-            ],
-            "status": "occupied"
-        }
+        "1": [
+            {
+                "coords": [
+                    78,
+                    83,
+                    141,
+                    307
+                ],
+                "status": "empty"
+            }
+        ],
+        "2": [
+            {
+                "coords": [
+                    210,
+                    87,
+                    280,
+                    273
+                ],
+                "status": "occupied"
+            }
+        ],
+        "3": [
+            {
+                "coords": [
+                    330,
+                    96,
+                    403,
+                    305
+                ],
+                "status": "occupied"
+            }
+        ],
+        "4": [
+            {
+                "coords": [
+                    462,
+                    96,
+                    531,
+                    301
+                ],
+                "status": "occupied"
+            }
+        ]
     }
 }

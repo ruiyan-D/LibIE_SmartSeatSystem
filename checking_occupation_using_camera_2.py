@@ -15,7 +15,7 @@ ITEM_CLASSES = {
 }
 
 # 读取座位配置
-with open("seats_config.json", "r") as f:
+with open("seats_config.json", "r", encoding="utf-8") as f:
     seats_config = json.load(f)
 
 # 获取摄像头列表
@@ -130,6 +130,49 @@ print(f"摄像头布局: {rows}行 x {cols}列")
 cell_width = (CANVAS_WIDTH - (cols + 1) * PADDING) // cols
 cell_height = (CANVAS_HEIGHT - (rows + 1) * PADDING) // rows
 
+# 预先处理座位配置，按行分组
+cam_seats_by_row = {}
+for cam_id in camera_ids:
+    cam_config = seats_config[cam_id]
+    seats_by_row = {}
+
+    # 处理旧格式（座位列表）
+    if "seats" in cam_config and isinstance(cam_config["seats"], list):
+        for seat in cam_config["seats"]:
+            # 旧格式：座位是列表 [x1, y1, x2, y2] 或字典 {coords: [x1,y1,x2,y2], row: n}
+            if isinstance(seat, list) and len(seat) == 4:
+                # 没有行信息，默认为第1行
+                row = 1
+                coords = seat
+            elif isinstance(seat, dict) and "coords" in seat and "row" in seat:
+                row = seat["row"]
+                coords = seat["coords"]
+            else:
+                print(f"警告: {cam_id} 的座位格式错误: {seat}")
+                continue
+
+            if row not in seats_by_row:
+                seats_by_row[row] = []
+            seats_by_row[row].append(coords)
+
+    # 处理新格式（按行组织）
+    elif "rows" in cam_config and isinstance(cam_config["rows"], dict):
+        for row, seats in cam_config["rows"].items():
+            try:
+                row_num = int(row)
+                if row_num not in seats_by_row:
+                    seats_by_row[row_num] = []
+
+                for seat in seats:
+                    if isinstance(seat, list) and len(seat) == 4:
+                        seats_by_row[row_num].append(seat)
+                    else:
+                        print(f"警告: {cam_id} 行{row_num}的座位格式错误: {seat}")
+            except ValueError:
+                print(f"警告: {cam_id} 的行号格式错误: {row}")
+
+    cam_seats_by_row[cam_id] = seats_by_row
+
 # 主循环
 while True:
     # 创建空白画布
@@ -186,62 +229,73 @@ while True:
                 elif cls in ITEM_CLASSES:
                     detected_items.append((x1, y1, x2, y2, cls))
 
-        # 处理座位
-        seats_list = seats_config[cam_id].get("seats", [])
+        # 处理座位 - 按行组织
+        seats_by_row = cam_seats_by_row.get(cam_id, {})
         local_seat_status = {}
 
-        # 处理座位配置
-        for seat_idx, seat_data in enumerate(seats_list):
-            # 确保是坐标列表
-            if isinstance(seat_data, list) and len(seat_data) == 4:
-                coords = seat_data
-            else:
-                print(f"警告: 未知的座位格式 {cam_id} 座位 {seat_idx}")
-                continue
+        # 按行处理座位
+        for row, seats_in_row in seats_by_row.items():
+            row_seat_status = []
 
-            # 确保有4个坐标值
-            if len(coords) != 4:
-                print(f"警告: 坐标数量错误 {cam_id} 座位 {seat_idx}: {coords}")
-                continue
+            for seat_idx, coords in enumerate(seats_in_row):
+                # 确保有4个坐标值
+                if len(coords) != 4:
+                    print(f"警告: {cam_id} 行{row}座位{seat_idx}坐标错误: {coords}")
+                    continue
 
-            x1, y1, x2, y2 = coords
+                x1, y1, x2, y2 = coords
 
-            # 检查是否有人
-            has_person = any(not (px2 < x1 or px1 > x2 or py2 < y1 or py1 > y2)
-                             for px1, py1, px2, py2 in detected_persons)
+                # 检查是否有人
+                has_person = any(not (px2 < x1 or px1 > x2 or py2 < y1 or py1 > y2)
+                                 for px1, py1, px2, py2 in detected_persons)
 
-            # 检查是否有物品
-            has_item = any(not (ix2 < x1 or ix1 > x2 or iy2 < y1 or iy1 > y2)
-                           for ix1, iy1, ix2, iy2, cls in detected_items)
+                # 检查是否有物品
+                has_item = any(not (ix2 < x1 or ix1 > x2 or iy2 < y1 or iy1 > y2)
+                               for ix1, iy1, ix2, iy2, cls in detected_items)
 
-            # 确定状态
-            status = "empty"
-            color = (0, 255, 0)  # 绿色：空位
-            if has_person:
-                status = "occupied"
-                color = (0, 0, 255)  # 红色：有人
-            elif has_item:
-                status = "item_only"
-                color = (0, 165, 255)  # 橙色：物品
+                # 确定状态
+                status = "empty"
+                color = (0, 255, 0)  # 绿色：空位
+                if has_person:
+                    status = "occupied"
+                    color = (0, 0, 255)  # 红色：有人
+                elif has_item:
+                    status = "item_only"
+                    color = (0, 165, 255)  # 橙色：物品
 
-            # 存储状态
-            local_seat_status[f"seat_{seat_idx}"] = {
-                "coords": coords,
-                "status": status
-            }
+                # 存储座位状态
+                row_seat_status.append({
+                    "coords": coords,
+                    "status": status
+                })
 
-            # 在帧上绘制座位框
-            cv2.rectangle(display_frame, (x1, y1), (x2, y2), color, 2)
-            cv2.putText(display_frame, f"Seat {seat_idx}", (x1, y1 - 5),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
+                # 在帧上绘制座位框
+                cv2.rectangle(display_frame, (x1, y1), (x2, y2), color, 2)
+
+                # 显示座位信息（行和座位号）
+                seat_text = f"Row{row} Seat{seat_idx}"
+                cv2.putText(display_frame, seat_text, (x1, y1 - 5),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
+
+            # 存储该行的座位状态
+            local_seat_status[row] = row_seat_status
 
         # 更新全局状态
         with seat_status_lock:
             seat_status[cam_id] = local_seat_status
 
-        # 在帧上添加摄像头ID
-        cv2.putText(display_frame, cam_id, (10, 30),
+        # 在帧上添加摄像头ID和座位统计
+        cam_text = f"Cam: {cam_id.split('_')[1]}"
+        cv2.putText(display_frame, cam_text, (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
+
+        # 添加座位统计信息
+        total_seats = sum(len(row_seats) for row_seats in seats_by_row.values())
+        occupied = sum(1 for row_seats in local_seat_status.values()
+                       for seat in row_seats if seat["status"] == "occupied")
+        stats_text = f"Seats: {occupied}/{total_seats} occupied"
+        cv2.putText(display_frame, stats_text, (10, 60),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 200, 255), 2)
 
         # 将帧缩放到格子大小，保持比例
         h, w = display_frame.shape[:2]
@@ -265,12 +319,12 @@ while True:
             continue
 
         # 计算在画布上的位置
-        row = i // cols
-        col = i % cols
+        row_idx = i // cols
+        col_idx = i % cols
 
         # 计算起始位置（居中放置）
-        start_x = PADDING + col * (cell_width + PADDING) + (cell_width - new_width) // 2
-        start_y = PADDING + row * (cell_height + PADDING) + (cell_height - new_height) // 2
+        start_x = PADDING + col_idx * (cell_width + PADDING) + (cell_width - new_width) // 2
+        start_y = PADDING + row_idx * (cell_height + PADDING) + (cell_height - new_height) // 2
 
         # 确保位置在画布范围内
         if start_x < 0 or start_y < 0 or start_x + new_width > CANVAS_WIDTH or start_y + new_height > CANVAS_HEIGHT:
@@ -283,7 +337,7 @@ while True:
     # 显示总画布
     cv2.imshow("Multi-Camera Seat Monitoring", canvas)
 
-    # 保存状态
+    # 保存状态（按行组织）
     with open('seat_status.json', 'w') as f:
         json.dump(seat_status, f, indent=4)
 

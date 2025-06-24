@@ -1,6 +1,8 @@
 import cv2
 import json
 import numpy as np
+from PIL import Image, ImageDraw, ImageFont
+import os
 
 # 初始化摄像头列表
 cameras = []
@@ -19,7 +21,7 @@ for cam_id in camera_ids:
             "id": cam_id,
             "cap": cap,
             "frame": None,
-            "seats": [],
+            "seats": [],  # 存储座位信息
             "aspect_ratio": aspect_ratio,
             "display_scale": 1.0,
             "display_offset": (0, 0)
@@ -37,6 +39,7 @@ is_drawing = False
 start_point = None
 end_point = None
 current_mouse_pos = None
+current_row = 1  # 当前排数
 THUMBNAIL_HEIGHT = 120  # 缩略图高度
 MAIN_HEIGHT = 600  # 主画面高度
 MIN_THUMBNAIL_WIDTH = 100  # 最小缩略图宽度
@@ -47,8 +50,72 @@ cv2.namedWindow('Camera Seat Marker')
 cv2.resizeWindow('Camera Seat Marker', WINDOW_WIDTH, MAIN_HEIGHT + THUMBNAIL_HEIGHT + 50)
 
 
+# 字体处理
+def load_font(font_size=24):
+    """加载支持中英文字体"""
+    # 尝试多种可能的字体路径
+    font_paths = [
+        "C:/Windows/Fonts/simhei.ttf",  # Windows 中文
+        "C:/Windows/Fonts/arial.ttf",  # Windows 英文
+        "/System/Library/Fonts/PingFang.ttc",  # macOS
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",  # Linux
+        "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc",  # Linux
+        "simhei.ttf",  # 当前目录
+        "arial.ttf"  # 当前目录
+    ]
+
+    # 尝试加载字体
+    for path in font_paths:
+        try:
+            if os.path.exists(path):
+                return ImageFont.truetype(path, font_size)
+        except Exception as e:
+            print(f"字体加载失败: {path}, 错误: {e}")
+
+    # 如果所有字体都加载失败，尝试系统默认字体
+    try:
+        return ImageFont.load_default()
+    except:
+        return None
+
+
+# 加载不同大小的字体
+chinese_font = load_font(24)  # 主文本字体
+thumbnail_font = load_font(14)  # 缩略图字体
+small_font = load_font(18)  # 小号字体
+
+print(f"使用字体: {chinese_font}")
+
+
+def draw_text(img, text, position=(20, 10), color=(0, 255, 255), font=None):
+    """在图像上绘制文本"""
+    if font is None:
+        font = chinese_font
+
+    # 如果没有可用字体，使用OpenCV绘制
+    if font is None:
+        cv2.putText(img, text, position, cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
+        return img
+
+    try:
+        # 转为PIL格式（RGB）
+        img_pil = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        draw = ImageDraw.Draw(img_pil)
+
+        # 绘制文本
+        draw.text(position, text, font=font, fill=color)
+
+        # 转回OpenCV格式（BGR）
+        return cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+    except Exception as e:
+        print(f"绘制文本错误: {e}")
+        # 出错时使用OpenCV绘制
+        cv2.putText(img, text, position, cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
+        return img
+
+
 def mouse_callback(event, x, y, flags, param):
-    global is_drawing, start_point, end_point, current_mouse_pos
+    global is_drawing, start_point, end_point, current_mouse_pos, current_row
 
     # 更新当前鼠标位置
     current_mouse_pos = (x, y)
@@ -87,9 +154,14 @@ def mouse_callback(event, x, y, flags, param):
         x1, y1 = min(start_point[0], end_point[0]), min(start_point[1], end_point[1])
         x2, y2 = max(start_point[0], end_point[0]), max(start_point[1], end_point[1])
 
-        # 保存座位坐标
-        cameras[current_cam_idx]["seats"].append([x1, y1, x2, y2])
-        print(f"摄像头 {current_cam_idx} 添加座位: [{x1}, {y1}, {x2}, {y2}]")
+        # 保存座位坐标和排数
+        seat_data = {
+            "coords": [x1, y1, x2, y2],
+            "row": current_row  # 添加排数信息
+        }
+        cameras[current_cam_idx]["seats"].append(seat_data)
+
+        print(f"摄像头 {current_cam_idx} 第{current_row}排添加座位: [{x1}, {y1}, {x2}, {y2}]")
 
         # 重置点
         start_point = None
@@ -138,10 +210,11 @@ def original_to_display_coords(orig_x, orig_y):
 
 
 def switch_camera(new_idx):
-    global current_cam_idx
+    global current_cam_idx, current_row
     if 0 <= new_idx < len(cameras):
         current_cam_idx = new_idx
-        print(f"切换到摄像头 {new_idx} (ID: {cameras[new_idx]['id']})")
+        current_row = 1  # 重置排数为1
+        print(f"切换到摄像头 {new_idx} (ID: {cameras[new_idx]['id']}), 排数重置为1")
 
 
 def get_thumbnail_width(cam):
@@ -160,12 +233,9 @@ def draw_ui(combined_frame):
 
     # 添加底部状态信息
     status_y = THUMBNAIL_HEIGHT + MAIN_HEIGHT + 30
-    cv2.putText(combined_frame, "操作说明:", (10, status_y),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
-    cv2.putText(combined_frame, "点击缩略图切换摄像头 | 在主画面拖动标记座位", (120, status_y),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 200, 255), 1)
-    cv2.putText(combined_frame, "按键: 's'保存 | 'c'清除当前座位 | 'a'添加摄像头 | 'r'移除摄像头 | 'q'退出",
-                (10, status_y + 25),
+    text = f"按键: 'a'下一排 | 'z'回退排数 | 's'保存 | 'c'清除 | 'q'退出"
+    cv2.putText(combined_frame, text,
+                (10, status_y),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 200, 255), 1)
 
 
@@ -244,13 +314,14 @@ def create_thumbnail(cam, idx, is_current):
         # 在缩略图上绘制座位
         for seat in cam["seats"]:
             # 缩放座位坐标到缩略图尺寸
-            x1 = int((seat[0] * scale) + start_x)
-            y1 = int(seat[1] * scale)
-            x2 = int((seat[2] * scale) + start_x)
-            y2 = int(seat[3] * scale)
+            coords = seat["coords"]
+            x1 = int((coords[0] * scale) + start_x)
+            y1 = int(coords[1] * scale)
+            x2 = int((coords[2] * scale) + start_x)
+            y2 = int(coords[3] * scale)
             cv2.rectangle(thumbnail, (x1, y1), (x2, y2), (0, 255, 0), 1)
 
-        # 添加摄像头标识
+        # 添加摄像头标识 - 使用OpenCV绘制英文
         cv2.putText(thumbnail, f"Cam {idx}", (10, 25),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
         cv2.putText(thumbnail, f"ID: {cam['id']}", (10, 55),
@@ -259,7 +330,7 @@ def create_thumbnail(cam, idx, is_current):
                     cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 200, 255), 1)
 
     else:
-        # 无画面时的显示
+        # 无画面时的显示 - 使用OpenCV绘制英文
         cv2.putText(thumbnail, f"Cam {idx}", (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
         cv2.putText(thumbnail, "No Feed", (10, 70),
@@ -306,11 +377,25 @@ def create_main_frame():
         # 绘制已标记的座位（使用原始坐标）
         for seat in cam["seats"]:
             # 转换坐标到显示位置
-            x1 = int(seat[0] * scale) + start_x
-            y1 = int(seat[1] * scale) + start_y
-            x2 = int(seat[2] * scale) + start_x
-            y2 = int(seat[3] * scale) + start_y
-            cv2.rectangle(main_frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            coords = seat["coords"]
+            x1 = int(coords[0] * scale) + start_x
+            y1 = int(coords[1] * scale) + start_y
+            x2 = int(coords[2] * scale) + start_x
+            y2 = int(coords[3] * scale) + start_y
+
+            # 根据排数设置不同颜色
+            row = seat["row"]
+            color = (
+                (0, 255, 0) if row % 3 == 1 else  # 绿色
+                (0, 255, 255) if row % 3 == 2 else  # 黄色
+                (255, 0, 0)  # 蓝色
+            )
+
+            cv2.rectangle(main_frame, (x1, y1), (x2, y2), color, 2)
+
+            # 显示排数 - 使用OpenCV绘制英文和数字
+            cv2.putText(main_frame, f"Row{row}", (x1, y1 - 5),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
 
         # 绘制当前正在绘制的矩形
         if is_drawing and start_point:
@@ -326,16 +411,18 @@ def create_main_frame():
                 # 绘制矩形
                 cv2.rectangle(main_frame, (disp_x1, disp_y1), (mouse_x, mouse_y), (0, 0, 255), 2)
 
-        # 添加摄像头信息
-        cv2.putText(main_frame, f"Camera {cam['id']} - Marking Mode",
-                    (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
-        cv2.putText(main_frame, f"Seats marked: {len(cam['seats'])}",
-                    (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 200, 255), 2)
+        # 添加摄像头信息和当前排数 - 使用橙色(0, 165, 255)
+        info_text = f"摄像头 {cam['id']} - 当前标记第{current_row}排"
+        main_frame = draw_text(main_frame, info_text, (10, 30), (0, 165, 255))
+
+        # 添加座位统计信息 - 使用draw_text确保中文正确显示
+        stats_text = f"座位总数: {len(cam['seats'])}"
+        main_frame = draw_text(main_frame, stats_text, (10, 70), (0, 200, 255), small_font)
     else:
         # 无画面时的显示
-        cv2.putText(main_frame, f"Camera {cam['id']} - No Feed",
-                    (WINDOW_WIDTH // 2 - 150, MAIN_HEIGHT // 2),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+        no_feed_text = f"摄像头 {cam['id']} - 无信号"
+        main_frame = draw_text(main_frame, no_feed_text,
+                               (WINDOW_WIDTH // 2 - 150, MAIN_HEIGHT // 2), (0, 0, 255))
 
     return main_frame
 
@@ -350,9 +437,10 @@ print("操作说明:")
 print("1. 点击顶部缩略图切换摄像头")
 print("2. 在主画面中拖动鼠标标记座位")
 print("3. 按键功能:")
+print("   'a' - 切换到下一排")
+print("   'z' - 回退排数")
 print("   's' - 保存配置")
 print("   'c' - 清除当前摄像头的所有座位")
-print("   'a' - 添加新摄像头")
 print("   'r' - 移除当前摄像头")
 print("   'q' - 退出程序")
 print("=" * 50)
@@ -413,6 +501,9 @@ while True:
     combined_frame = np.vstack([top_panel, main_frame])
 
     # 添加UI元素
+    # 在顶部显示当前排数 - 使用橙色(0, 165, 255)
+    row_text = f"当前排数: {current_row}"
+    combined_frame = draw_text(combined_frame, row_text, (10, THUMBNAIL_HEIGHT + 10), (0, 165, 255))
     draw_ui(combined_frame)
 
     # 显示最终画面
@@ -426,21 +517,25 @@ while True:
         config = {}
         for cam in cameras:
             config[f"camera_{cam['id']}"] = {
-                "seats": cam["seats"],
+                "seats": cam["seats"],  # 只保存座位列表
                 "aspect_ratio": cam["aspect_ratio"]
             }
 
-        with open('seats_config.json', 'w') as f:
-            json.dump(config, f, indent=4)
+        with open('seats_config.json', 'w', encoding='utf-8') as f:
+            json.dump(config, f, indent=4, ensure_ascii=False)
         print("配置已保存到 seats_config.json")
     elif key == ord('c'):  # 清除当前摄像头座位
         cameras[current_cam_idx]["seats"] = []
         print(f"已清除摄像头 {current_cam_idx} 的所有座位")
-    elif key == ord('a'):  # 添加新摄像头
-        # 尝试添加下一个可用的摄像头ID
-        new_id = max(cam["id"] for cam in cameras) + 1 if cameras else 0
-        if add_camera(new_id):
-            print(f"已添加摄像头 {new_id}，总数: {len(cameras)}")
+    elif key == ord('a'):  # 切换到下一排
+        current_row += 1
+        print(f"切换到第{current_row}排")
+    elif key == ord('z'):  # 回退排数
+        if current_row > 1:
+            current_row -= 1
+            print(f"回退到第{current_row}排")
+        else:
+            print("已在第一排，无法回退")
     elif key == ord('r'):  # 移除当前摄像头
         remove_current_camera()
     elif key in [ord(str(i)) for i in range(10)]:  # 数字键切换摄像头
