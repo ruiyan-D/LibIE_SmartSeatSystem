@@ -2,194 +2,69 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <title>智慧图书馆座位状态</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: url("/static/images/background.jpg") no-repeat center center fixed;
-      background-size: cover;
-      margin: 0;
-      padding: 0;
-      color: #fff;
-    }
+  <title>智座空间</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-    .header {
-      display: flex;
-      align-items: center;
-      padding: 10px 30px;
-      background-color: rgba(0, 0, 0, 0.4);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .header img {
-      height: 50px;
-      margin-right: 15px;
-    }
-
-    .header h1 {
-      font-size: 24px;
-      color: white;
-      margin: 0;
-    }
-
-    .main-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: calc(100vh - 80px);
-      padding: 40px 20px;
-    }
-
-    .grid-wrapper {
-      background: white;
-      padding: 30px 40px;
-      border-radius: 20px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-      color: black;
-      text-align: center;
-    }
-
-    .column-labels {
-      display: flex;
-      justify-content: center;
-      margin-left: 50px;
-    }
-
-    .column-label {
-      width: 80px;
-      height: 30px;
-      line-height: 30px;
-      margin: 0 5px;
-      font-weight: bold;
-      color: black;
-      text-align: center;
-    }
-
-    .row {
-      display: flex;
-      align-items: center;
-      margin: 10px 0;
-      justify-content: center;
-    }
-
-    .row-label {
-      width: 50px;
-      font-weight: bold;
-      margin-right: 10px;
-      color: black;
-    }
-
-    .seat {
-      width: 80px;
-      height: 80px;
-      margin: 0 5px;
-      border-radius: 12px;
-      line-height: 80px;
-      font-weight: bold;
-      color: white;
-      text-align: center;
-    }
-
-    .occupied { background: red; }
-    .empty { background: green; }
-    .item_only { background: orange; }
-
-    .podium {
-      margin-top: 30px;
-      padding: 10px 30px;
-      background: blue;
-      color: white;
-      border-radius: 12px;
-      display: inline-block;
-    }
-
-    .description {
-      background: rgba(255, 255, 255, 0.8);
-      margin-top: 30px;
-      padding: 10px 20px;
-      width: 50%;
-      border-radius: 12px;
-      font-size: 16px;
-      line-height: 1.6;
-      color: #333;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-      text-align: left;
-    }
-  </style>
 </head>
 <body>
+  <header class="header">
+    <h1 class="title">智座空间</h1>
+    <div class="info-box">
+      <p class="small-text">*安静分贝 0~50 dB，嘈杂 50~80 dB</p>
+<div class="dropdown-container">
+  <div class="dropdown">
+    <button class="dropbtn">优先级 ⮟</button>
+    <div class="dropdown-content">
+      <div class="dropdown-item" onclick="selectPriority('available')">✅ 有座</div>
+      <div class="dropdown-item" onclick="selectPriority('quiet')">🔇 无声</div>
 
-  <div class="header">
-    <img src="/static/images/nju_logo.png" alt="南京大学校徽" />
-    <h1>📚 实时座位占用状态</h1>
-  </div>
+      <div class="dropdown-item submenu">
+        🔥 热门区域 ▶
+        <div class="submenu-content">
+          <div onclick="selectPriority('hot_area_today')">📊 今日</div>
+          <div onclick="selectPriority('hot_area_week')">🗓️ 历史1周</div>
+          <div onclick="selectPriority('hot_area_month')">📆 历史1月</div>
+        </div>
+      </div>
 
-  <div class="main-container">
-    <div class="grid-wrapper">
-      <div id="column-labels" class="column-labels"></div>
-      <div id="seat-grid"></div>
-      <div class="podium">讲台</div>
+      <div class="dropdown-item submenu">
+        ⏰ 热门时段 ▶
+        <div class="submenu-content">
+          <div onclick="selectPriority('hot_time_week')">🗓️ 历史1周</div>
+          <div onclick="selectPriority('hot_time_month')">📆 历史1月</div>
+        </div>
+      </div>
     </div>
-
-    <div class="description">
-  <p>🟢 绿色表示座位空闲，🔴 红色表示座位已占用，🟠 橙色表示物品占座。</p>
-  <p>本系统基于 AI 视觉识别技术，结合摄像头实时检测图书馆座位状态。</p>
-  <p>前端每 5 秒自动同步后端检测结果，实现动态座位信息展示。</p>
+  </div>
 </div>
 
-  </div>
 
-  <script>
-    async function fetchAndRender() {
-      try {
-        const res = await fetch('/api/seat_status?_t=' + Date.now());
-        const data = await res.json();
+    </div>
+  </header>
 
-        const seatGrid = document.getElementById('seat-grid');
-        const columnLabels = document.getElementById('column-labels');
-        seatGrid.innerHTML = '';
-        columnLabels.innerHTML = '';
+  <hr class="divider" />
 
-        if (data.length === 0) return;
+  <main class="main">
+    <div class="card">
+      <h2>教学楼</h2>
+      <div class="room">
+        <span class="room-number">101</span>
+        <span class="room-detail">容量: 3/45 | 安静</span>
+      </div>
+      <hr />
+      <div class="room">
+        <span class="room-number">102</span>
+        <span class="room-detail">容量: 1/40 | 嘈杂</span>
+      </div>
+      <hr />
+      <div class="room">
+        <span class="room-number">203</span>
+        <span class="room-detail">容量: 38/40 | 嘈杂</span>
+      </div>
+    </div>
+  </main>
 
-        const cols = data[0].length;
-        for (let c = 0; c < cols; c++) {
-          const col = document.createElement('div');
-          col.className = 'column-label';
-          col.textContent = `第${c + 1}列`;
-          columnLabels.appendChild(col);
-        }
-
-        const totalRows = data.length;
-        for (let r = 0; r <=totalRows - 1 ; r++) {
-          const row = data[r];
-          const rowDiv = document.createElement('div');
-          rowDiv.className = 'row';
-
-          const rowLabel = document.createElement('div');
-          rowLabel.className = 'row-label';
-          rowLabel.textContent = `第${totalRows - r}行`;
-          rowDiv.appendChild(rowLabel);
-
-          row.forEach(([seatId, _, status]) => {
-            const div = document.createElement('div');
-            div.className = `seat ${status}`;
-            div.textContent = seatId;
-            rowDiv.appendChild(div);
-          });
-
-          seatGrid.appendChild(rowDiv);
-        }
-      } catch (err) {
-        console.error("获取数据失败：", err);
-      }
-    }
-
-    fetchAndRender();
-    setInterval(fetchAndRender, 5000);
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
+
