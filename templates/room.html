@@ -137,25 +137,46 @@
 
     </div>
   </div>
+<script>
+const roomToCamera = {
+  "101": "camera_0",
+  "102": "camera_1",
+  "203": "camera_2"
+};
 
-  <script>
-    // 这是示例，后续可改成从后端拉数据
-    const seats = [
-      { id: 'seat1', status: 'empty' },
-      { id: 'seat2', status: 'occupied' },
-      { id: 'seat3', status: 'item_only' },
-      { id: 'seat4', status: 'empty' },
-      { id: 'seat5', status: 'occupied' },
-    ];
+const params = new URLSearchParams(location.search);
+const room = params.get("room");
+const cameraId = roomToCamera[room];
+document.querySelector('.header h1').textContent = `教室 ${room} 座位详情`;
 
-    const seatsDiv = document.getElementById('seats');
-    seats.forEach(seat => {
-      const div = document.createElement('div');
-      div.className = `seat ${seat.status}`;
-      div.textContent = seat.id;
-      seatsDiv.appendChild(div);
+function loadSeatStatus() {
+  fetch(`/api/seat_status_raw/${cameraId}`)
+    .then(res => res.json())
+    .then(data => {
+      const seatsDiv = document.getElementById('seats');
+      seatsDiv.innerHTML = "";
+
+      const sortedRows = Object.entries(data).sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
+
+      sortedRows.forEach(([row, seatList]) => {
+        seatList.sort((s1, s2) => s1.coords[0] - s2.coords[0]);
+        seatList.forEach((seat, idx) => {
+          const div = document.createElement('div');
+          div.className = `seat ${seat.status}`;
+          div.textContent = `R${row}_S${idx + 1}`;
+          seatsDiv.appendChild(div);
+        });
+      });
     });
-  </script>
+}
+
+// 页面加载立即执行一次
+loadSeatStatus();
+
+// 每 2 秒刷新一次
+setInterval(loadSeatStatus, 2000);
+
+</script>
 
 </body>
 </html>

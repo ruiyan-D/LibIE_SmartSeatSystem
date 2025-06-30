@@ -3,140 +3,68 @@
         "1": [
             {
                 "coords": [
-                    61,
-                    96,
-                    127,
-                    180
+                    146,
+                    105,
+                    316,
+                    211
                 ],
-                "status": "empty"
+                "status": "occupied"
             },
+            {
+                "coords": [
+                    378,
+                    85,
+                    499,
+                    144
+                ],
+                "status": "occupied"
+            },
+            {
+                "coords": [
+                    120,
+                    288,
+                    298,
+                    353
+                ],
+                "status": "occupied"
+            },
+            {
+                "coords": [
+                    366,
+                    291,
+                    508,
+                    369
+                ],
+                "status": "occupied"
+            }
+        ],
+        "2": [
             {
                 "coords": [
                     175,
-                    92,
-                    236,
-                    169
-                ],
-                "status": "item_only"
-            }
-        ],
-        "2": [
-            {
-                "coords": [
-                    276,
-                    92,
-                    326,
-                    180
-                ],
-                "status": "item_only"
-            },
-            {
-                "coords": [
-                    80,
-                    202,
-                    133,
-                    268
+                    22,
+                    277,
+                    34
                 ],
                 "status": "empty"
             },
             {
                 "coords": [
-                    316,
-                    214,
-                    364,
-                    311
+                    344,
+                    36,
+                    433,
+                    37
                 ],
-                "status": "item_only"
-            }
-        ],
-        "3": [
-            {
-                "coords": [
-                    207,
-                    206,
-                    249,
-                    287
-                ],
-                "status": "item_only"
-            }
-        ]
-    },
-    "camera_1": {
-        "1": [
-            {
-                "coords": [
-                    136,
-                    88,
-                    201,
-                    196
-                ],
-                "status": "item_only"
+                "status": "empty"
             },
             {
                 "coords": [
-                    299,
-                    100,
-                    364,
-                    218
-                ],
-                "status": "item_only"
-            }
-        ],
-        "2": [
-            {
-                "coords": [
-                    432,
-                    96,
-                    508,
-                    197
-                ],
-                "status": "occupied"
-            }
-        ]
-    },
-    "camera_2": {
-        "1": [
-            {
-                "coords": [
-                    78,
-                    83,
-                    141,
-                    307
+                    496,
+                    34,
+                    542,
+                    52
                 ],
                 "status": "empty"
-            }
-        ],
-        "2": [
-            {
-                "coords": [
-                    210,
-                    87,
-                    280,
-                    273
-                ],
-                "status": "occupied"
-            }
-        ],
-        "3": [
-            {
-                "coords": [
-                    330,
-                    96,
-                    403,
-                    305
-                ],
-                "status": "occupied"
-            }
-        ],
-        "4": [
-            {
-                "coords": [
-                    462,
-                    96,
-                    531,
-                    301
-                ],
-                "status": "occupied"
             }
         ]
     }

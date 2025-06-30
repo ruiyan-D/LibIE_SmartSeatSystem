@@ -273,7 +273,12 @@ while True:
                 cv2.rectangle(display_frame, (x1, y1), (x2, y2), color, 2)
 
                 # 显示座位信息（行和座位号）
-                seat_text = f"Row{row} Seat{seat_idx}"
+                seat_text = f"Row{row} Seat{seat_idx + 1}"
+
+        
+
+              
+
                 cv2.putText(display_frame, seat_text, (x1, y1 - 5),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
 
