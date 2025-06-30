@@ -413,7 +413,10 @@ def create_main_frame():
 
         # 添加摄像头信息和当前排数 - 使用橙色(0, 165, 255)
         info_text = f"摄像头 {cam['id']} - 当前标记第{current_row}排"
-        main_frame = draw_text(main_frame, info_text, (10, 30), (0, 165, 255))
+     
+        main_frame = draw_text(main_frame, info_text, (10, 30), (0, 165, 255), font=chinese_font)
+
+        
 
         # 添加座位统计信息 - 使用draw_text确保中文正确显示
         stats_text = f"座位总数: {len(cam['seats'])}"

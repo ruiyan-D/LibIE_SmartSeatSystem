@@ -1,18 +1,22 @@
-// 主页面填充教室列表
+// 主页面填充教室列表（动态容量）
 if (document.body.classList.contains("main-page")) {
-  const rooms = [
-    { name: "101", people: "3/45", noise: "安静" },
-    { name: "102", people: "1/40", noise: "嘈杂" },
-    { name: "203", people: "38/40", noise: "嘈杂" }
-  ];
+  const cameraToRoom = {
+    "camera_0": { name: "101", noise: "安静" },
+    "camera_1": { name: "102", noise: "嘈杂" },
+    "camera_2": { name: "203", noise: "嘈杂" }
+  };
 
-  const tbody = document.getElementById("room-list");
-  rooms.forEach(r => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td><a href="room.html?room=${r.name}">${r.name}</a></td>
-                    <td>${r.people}</td><td>${r.noise}</td>`;
-    tbody.appendChild(tr);
-  });
+  fetch("/api/summary")
+    .then(res => res.json())
+    .then(data => {
+      for (const [cameraId, status] of Object.entries(data)) {
+        const { name, noise } = cameraToRoom[cameraId];
+        const span = document.getElementById(`room-${name}-detail`);
+        if (span) {
+          span.textContent = `容量: ${status.occupied}/${status.total} | ${noise}`;
+        }
+      }
+    });
 }
 
 // 详情页加载
@@ -25,12 +29,12 @@ if (document.body.classList.contains("room-page")) {
   const seatGrid = document.getElementById("seat-grid");
   for (let i = 0; i < 15; i++) {
     const div = document.createElement("div");
-    div.className = ["green","red","orange"][i % 3];
-    div.textContent = `Seat ${i+1}`;
+    div.className = ["green", "red", "orange"][i % 3];
+    div.textContent = `Seat ${i + 1}`;
     seatGrid.appendChild(div);
   }
 
   // 模拟分贝
-  document.getElementById("noise-status").textContent = `当前分贝：${Math.floor(Math.random()*20+40)} dB 🎵`;
+  document.getElementById("noise-status").textContent =
+    `当前分贝：${Math.floor(Math.random() * 20 + 40)} dB 🎵`;
 }
-

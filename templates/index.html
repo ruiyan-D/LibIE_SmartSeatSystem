@@ -4,41 +4,38 @@
   <meta charset="UTF-8" />
   <title>智座空间</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
 </head>
 <body>
   <header class="header">
     <h1 class="title">智座空间</h1>
     <div class="info-box">
       <p class="small-text">*安静分贝 0~50 dB，嘈杂 50~80 dB</p>
-<div class="dropdown-container">
-  <div class="dropdown">
-    <button class="dropbtn">优先级 ⮟</button>
-    <div class="dropdown-content">
-      <div class="dropdown-item" onclick="selectPriority('available')">✅ 有座</div>
-      <div class="dropdown-item" onclick="selectPriority('quiet')">🔇 无声</div>
+      <div class="dropdown-container">
+        <div class="dropdown">
+          <button class="dropbtn">优先级 ⮟</button>
+          <div class="dropdown-content">
+            <div class="dropdown-item" onclick="selectPriority('available')">✅ 有座</div>
+            <div class="dropdown-item" onclick="selectPriority('quiet')">🔇 无声</div>
 
-      <div class="dropdown-item submenu">
-        🔥 热门区域 ▶
-        <div class="submenu-content">
-          <div onclick="selectPriority('hot_area_today')">📊 今日</div>
-          <div onclick="selectPriority('hot_area_week')">🗓️ 历史1周</div>
-          <div onclick="selectPriority('hot_area_month')">📆 历史1月</div>
+            <div class="dropdown-item submenu">
+              🔥 热门区域 ▶
+              <div class="submenu-content">
+                <div onclick="selectPriority('hot_area_today')">📊 今日</div>
+                <div onclick="selectPriority('hot_area_week')">🗓️ 历史1周</div>
+                <div onclick="selectPriority('hot_area_month')">📆 历史1月</div>
+              </div>
+            </div>
+
+            <div class="dropdown-item submenu">
+              ⏰ 热门时段 ▶
+              <div class="submenu-content">
+                <div onclick="selectPriority('hot_time_week')">🗓️ 历史1周</div>
+                <div onclick="selectPriority('hot_time_month')">📆 历史1月</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <div class="dropdown-item submenu">
-        ⏰ 热门时段 ▶
-        <div class="submenu-content">
-          <div onclick="selectPriority('hot_time_week')">🗓️ 历史1周</div>
-          <div onclick="selectPriority('hot_time_month')">📆 历史1月</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
     </div>
   </header>
 
@@ -47,24 +44,23 @@
   <main class="main">
     <div class="card">
       <h2>教学楼</h2>
-      <div class="room">
+      <a class="room" href="room.html?room=101">
         <span class="room-number">101</span>
-        <span class="room-detail">容量: 3/45 | 安静</span>
-      </div>
+        <span class="room-detail" id="room-101-detail">容量: 3/45 | 安静</span>
+      </a>
       <hr />
-      <div class="room">
+      <a class="room" href="room.html?room=102">
         <span class="room-number">102</span>
-        <span class="room-detail">容量: 1/40 | 嘈杂</span>
-      </div>
+        <span class="room-detail" id="room-102-detail">容量: 1/40 | 嘈杂</span>
+      </a>
       <hr />
-      <div class="room">
+      <a class="room" href="room.html?room=203">
         <span class="room-number">203</span>
-        <span class="room-detail">容量: 38/40 | 嘈杂</span>
-      </div>
+        <span class="room-detail" id="room-203-detail">容量: 38/40 | 嘈杂</span>
+      </a>
     </div>
   </main>
 
   <script src="script.js"></script>
 </body>
 </html>
-
