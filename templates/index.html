@@ -5,7 +5,7 @@
   <title>智座空间</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body>
+<body class="main-page">
   <header class="header">
     <h1 class="title">智座空间</h1>
     <div class="info-box">
@@ -61,6 +61,8 @@
     </div>
   </main>
 
-  <script src="script.js"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+
 </body>
 </html>
