@@ -1,91 +1,285 @@
 {
-    "camera_0": {
-        "1": [
-            {
-                "coords": [
-                    130,
-                    92,
-                    280,
-                    228
-                ],
-                "status": "empty"
-            },
-            {
-                "coords": [
-                    382,
-                    127,
-                    468,
-                    214
-                ],
-                "status": "empty"
-            },
-            {
-                "coords": [
-                    163,
-                    291,
-                    316,
-                    381
-                ],
-                "status": "occupied"
-            },
-            {
-                "coords": [
-                    414,
-                    328,
-                    518,
-                    422
-                ],
-                "status": "occupied"
-            }
+  "camera_0": {
+    "1": [
+      {
+        "coords": [
+          320,
+          716,
+          380,
+          764
         ],
-        "2": [
-            {
-                "coords": [
-                    380,
-                    262,
-                    465,
-                    292
-                ],
-                "status": "empty"
-            },
-            {
-                "coords": [
-                    78,
-                    416,
-                    179,
-                    464
-                ],
-                "status": "empty"
-            },
-            {
-                "coords": [
-                    330,
-                    71,
-                    403,
-                    96
-                ],
-                "status": "empty"
-            }
+        "status": "item_only"
+      },
+      {
+        "coords": [
+          453,
+          713,
+          507,
+          763
         ],
-        "3": [
-            {
-                "coords": [
-                    481,
-                    40,
-                    551,
-                    80
-                ],
-                "status": "empty"
-            },
-            {
-                "coords": [
-                    526,
-                    137,
-                    568,
-                    171
-                ],
-                "status": "empty"
-            }
-        ]
-    }
+        "status": "empty"
+      },
+      {
+        "coords": [
+          624,
+          713,
+          685,
+          756
+        ],
+        "status": "occupied"
+      },
+      {
+        "coords": [
+          797,
+          716,
+          851,
+          756
+        ],
+        "status": "empty"
+      },
+      {
+        "coords": [
+          965,
+          708,
+          1028,
+          736
+        ],
+        "status": "empty"
+      }
+    ],
+    "2": [
+      {
+        "coords": [
+          430,
+          482,
+          519,
+          529
+        ],
+        "status": "occupied"
+      },
+      {
+        "coords": [
+          587,
+          486,
+          649,
+          525
+        ],
+        "status": "empty"
+      },
+      {
+        "coords": [
+          717,
+          492,
+          795,
+          527
+        ],
+        "status": "occupied"
+      },
+      {
+        "coords": [
+          874,
+          490,
+          956,
+          532
+        ],
+        "status": "occupied"
+      }
+    ],
+    "3": [
+      {
+        "coords": [
+          579,
+          383,
+          630,
+          408
+        ],
+        "status": "empty"
+      },
+      {
+        "coords": [
+          724,
+          376,
+          778,
+          400
+        ],
+        "status": "empty"
+      },
+      {
+        "coords": [
+          872,
+          372,
+          921,
+          394
+        ],
+        "status": "empty"
+      },
+      {
+        "coords": [
+          990,
+          360,
+          1045,
+          392
+        ],
+        "status": "empty"
+      }
+    ]
+  },
+  "camera_1": {
+    "1": [
+      {
+        "coords": [
+          472,
+          619,
+          576,
+          686
+        ],
+        "status": "item_only"
+      },
+      {
+        "coords": [
+          753,
+          607,
+          866,
+          678
+        ],
+        "status": "empty"
+      },
+      {
+        "coords": [
+          1068,
+          576,
+          1143,
+          654
+        ],
+        "status": "empty"
+      }
+    ],
+    "2": [
+      {
+        "coords": [
+          326,
+          366,
+          436,
+          436
+        ],
+        "status": "item_only"
+      },
+      {
+        "coords": [
+          538,
+          377,
+          644,
+          430
+        ],
+        "status": "empty"
+      },
+      {
+        "coords": [
+          771,
+          354,
+          876,
+          385
+        ],
+        "status": "item_only"
+      }
+    ]
+  },
+  "camera_2": {
+    "1": [
+      {
+        "coords": [
+          123,
+          562,
+          219,
+          606
+        ],
+        "status": "empty"
+      },
+      {
+        "coords": [
+          355,
+          571,
+          440,
+          626
+        ],
+        "status": "empty"
+      },
+      {
+        "coords": [
+          569,
+          572,
+          708,
+          622
+        ],
+        "status": "empty"
+      }
+    ],
+    "2": [
+      {
+        "coords": [
+          227,
+          469,
+          302,
+          507
+        ],
+        "status": "empty"
+      },
+      {
+        "coords": [
+          387,
+          470,
+          465,
+          510
+        ],
+        "status": "item_only"
+      },
+      {
+        "coords": [
+          597,
+          473,
+          671,
+          512
+        ],
+        "status": "empty"
+      },
+      {
+        "coords": [
+          727,
+          487,
+          813,
+          515
+        ],
+        "status": "empty"
+      }
+    ],
+    "3": [
+      {
+        "coords": [
+          452,
+          398,
+          528,
+          428
+        ],
+        "status": "occupied"
+      },
+      {
+        "coords": [
+          592,
+          414,
+          667,
+          439
+        ],
+        "status": "empty"
+      },
+      {
+        "coords": [
+          711,
+          408,
+          805,
+          446
+        ],
+        "status": "occupied"
+      }
+    ]
+  }
 }
