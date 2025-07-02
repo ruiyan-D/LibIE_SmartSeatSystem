@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>今日热门教室</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    .hot-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    .hot-table th, .hot-table td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    .hot-table th { background: #f0f8ff; }
+    .back-btn { margin-top: 20px; background: #4a90e2; color: white; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-size: 16px; }
+    .back-btn:hover { background: #357ab7; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>今日热门教室</h1>
+    <a href="/" class="back-btn">← 返回主页</a>
+  </div>
+  <main class="main">
+    <div class="card">
+      <table class="hot-table" id="hot-area-table">
+        <thead>
+          <tr><th>教室编号</th><th>平均占用率(%)</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </main>
+  <script>
+    fetch('/api/hot_area_today').then(res=>res.json()).then(data=>{
+      const tbody = document.querySelector('#hot-area-table tbody');
+      tbody.innerHTML = '';
+      data.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${item.camera_id.replace('camera_', '')}</td><td>${item.avg_occupancy}</td>`;
+        tbody.appendChild(tr);
+      });
+    });
+  </script>
+</body>
+</html> 
