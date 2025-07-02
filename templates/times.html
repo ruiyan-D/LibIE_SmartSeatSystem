@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>热门时段查看</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url("{{ url_for('static', filename='images/bg_main.jpg') }}") no-repeat center center fixed;
+      background-size: cover;
+    }
+    .header {
+      background: #333;
+      color: white;
+      padding: 20px 40px;
+      font-size: 26px;
+      font-weight: bold;  /* ✅ 标题加粗 */
+    }
+    .main {
+      display: flex;
+      justify-content: center;
+      padding: 50px 20px;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 30px 40px;
+      width: 90%;
+      max-width: 800px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #ccc;
+    }
+    .btn {
+      margin-top: 20px;
+      padding: 8px 16px;
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">热门时段查看</div>
+
+  <div class="main">
+    <div class="card">
+      <h2>教室 {{ room_id }}</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>时间段</th>
+            <th>周一</th>
+            <th>周二</th>
+            <th>周三</th>
+            <th>周四</th>
+            <th>周五</th>
+            <th>周六</th>
+            <th>周日</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in range(11) %}
+          <tr>
+            <td>第{{ i + 1 }}节</td>
+            {% for j in range(7) %}
+              <td style="background-color: {{ heat_colors[i][j] }};"></td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <button onclick="window.location.href='{{ url_for('index') }}'" class="btn">← 返回主页</button>
+    </div>
+  </div>
+</body>
+</html>
