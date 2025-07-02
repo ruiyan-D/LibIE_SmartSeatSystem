@@ -15,7 +15,7 @@ ITEM_CLASSES = {
 }
 
 # 读取座位配置
-with open("seats_config.json", "r", encoding="utf-8") as f:
+with open("seats_config_on_camera.json", "r", encoding="utf-8") as f:
     seats_config = json.load(f)
 
 # 获取摄像头列表
@@ -343,7 +343,7 @@ while True:
     cv2.imshow("Multi-Camera Seat Monitoring", canvas)
 
     # 保存状态（按行组织）
-    with open('seat_status.json', 'w') as f:
+    with open('seat_status_on_camera.json', 'w') as f:
         json.dump(seat_status, f, indent=4)
 
     # 检查退出

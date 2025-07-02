@@ -8,7 +8,7 @@ from datetime import datetime
 
 # --- 配置区 ---
 # 你可以在这里修改文件名和时间间隔
-INPUT_JSON_FILE = 'seat_status.json'
+INPUT_JSON_FILE = 'seat_status_on_video.json'
 SEAT_COUNT_FILE = 'classroom_seat_counts.json' # 用于存储每个教室座位总数的文件
 OCCUPANCY_LOG_FILE = 'occupancy_log.csv'       # 用于记录历史占用数据的CSV文件
 LOGGING_INTERVAL_SECONDS = 600                 # 时间间隔（单位：秒），10分钟 = 600秒

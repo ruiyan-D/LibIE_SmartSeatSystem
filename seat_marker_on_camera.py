@@ -524,9 +524,9 @@ while True:
                 "aspect_ratio": cam["aspect_ratio"]
             }
 
-        with open('seats_config.json', 'w', encoding='utf-8') as f:
+        with open('seats_config_on_camera.json', 'w', encoding='utf-8') as f:
             json.dump(config, f, indent=4, ensure_ascii=False)
-        print("配置已保存到 seats_config.json")
+        print("配置已保存到 seats_config_on_camera.json")
     elif key == ord('c'):  # 清除当前摄像头座位
         cameras[current_cam_idx]["seats"] = []
         print(f"已清除摄像头 {current_cam_idx} 的所有座位")
