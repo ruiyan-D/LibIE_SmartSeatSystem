@@ -124,7 +124,20 @@ def main():
             cv2.putText(display, f"Row {r[4]}", (r[0], r[1] - 5),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2, cv2.LINE_AA)
 
-        # 状态说明文字（黑色）
+        # === 顶部中央摄像头名称 ===
+        camera_label = f"camera_{camera_index}"
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        text_scale = 1.2
+        thickness = 3
+        text_color = (255, 255, 255)
+
+        (text_width, text_height), _ = cv2.getTextSize(camera_label, font, text_scale, thickness)
+        text_x = (display.shape[1] - text_width) // 2
+        text_y = text_height + 10  # 距离顶部10像素
+
+        cv2.putText(display, camera_label, (text_x, text_y), font, text_scale, text_color, thickness, cv2.LINE_AA)
+
+        # === 左上角状态说明文字（黑色） ===
         info_texts = [
             "a: the number of rows increases",
             "z: the number of rows decreases",
@@ -134,11 +147,11 @@ def main():
             "q: exit"
         ]
 
-        y0 = 20
+        y0 = 50  # 避开顶部标题
         for i, text in enumerate(info_texts):
-            y = y0 + i * 20
+            y = y0 + i * 25
             cv2.putText(display, text, (10, y),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv2.LINE_AA)
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 0), 2, cv2.LINE_AA)
 
         cv2.imshow('Frame', display)
         key = cv2.waitKey(10) & 0xFF
