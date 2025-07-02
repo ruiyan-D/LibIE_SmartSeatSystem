@@ -18,11 +18,13 @@ CACHE_UPDATE_INTERVAL = 600  # 秒
 
 OCCUPANCY_LOG_FILE = 'occupancy_log.csv'
 
+status_path = "seat_status_on_video.json"
+
 def update_seat_status():
     global seat_status
     while True:
         try:
-            with open("seat_status.json", "r", encoding="utf-8") as f:
+            with open(status_path, "r", encoding="utf-8") as f:
                 content = f.read().strip()
                 if not content:
                     raise ValueError("seat_status.json is empty")

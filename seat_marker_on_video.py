@@ -12,7 +12,7 @@ video_paths = [
 ]
 
 # 配置文件路径
-config_path = "seats_config.json"
+config_path = "seats_config_on_video.json"
 
 # 加载或初始化配置
 if os.path.exists(config_path):
@@ -97,7 +97,7 @@ def save_current_seats():
 
     with open(config_path, "w", encoding="utf-8") as f:
         json.dump(seat_config, f, indent=4)
-    print(f"✅ 已保存 camera_{camera_index} 到 seats_config.json")
+    print(f"✅ 已保存 camera_{camera_index} 到 seats_config_on_video.json")
 
 # 主程序
 def main():

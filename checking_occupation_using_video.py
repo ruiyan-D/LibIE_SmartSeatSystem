@@ -16,7 +16,7 @@ ITEM_CLASSES = {
 }
 
 # 读取座位配置
-with open("seats_config.json", "r", encoding="utf-8") as f:
+with open("seats_config_on_video.json", "r", encoding="utf-8") as f:
     seats_config = json.load(f)
 
 # 获取摄像头列表
@@ -286,10 +286,10 @@ while True:
     # -----------------------------------------------------
     with seat_status_lock:
         try:
-            with open("seat_status.json", "w", encoding="utf-8") as f:
+            with open("seat_status_on_video.json", "w", encoding="utf-8") as f:
                 json.dump(seat_status, f, ensure_ascii=False, indent=2)
         except Exception as e:
-            print(f"写入 seat_status.json 失败: {e}")
+            print(f"写入 seat_status_on_video.json 失败: {e}")
     cv2.imshow("Classroom Seats", canvas)
     key = cv2.waitKey(30) & 0xFF
     if key == ord('q'):
