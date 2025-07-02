@@ -1,95 +1,152 @@
 import cv2
+import os
 import json
-from PIL import Image, ImageDraw, ImageFont
-import numpy as np
+CANVAS_WIDTH = 1080
+CANVAS_HEIGHT = 720
 
-# 初始化全局变量
-seats = []
-current_seat = []
-is_drawing = False
-current_row = 1  # 从第1排开始
+# 视频路径列表
+video_paths = [
+    "test_videos/class1.mp4",
+    "test_videos/class2.mp4",
+    "test_videos/class3.mp4"
+]
 
-# 鼠标回调函数
-def draw_seat(event, x, y, flags, param):
-    global current_seat, is_drawing, seats, frame
+# 配置文件路径
+config_path = "seats_config.json"
+
+# 加载或初始化配置
+if os.path.exists(config_path):
+    with open(config_path, "r", encoding="utf-8") as f:
+        seat_config = json.load(f)
+else:
+    seat_config = {}
+
+# 全局变量
+drawing = False
+ix, iy = -1, -1
+rectangles = []
+current_row = 1
+frame = None
+camera_index = 0
+
+# 鼠标事件回调
+def draw_rectangle(event, x, y, flags, param):
+    global ix, iy, drawing, rectangles, frame
 
     if event == cv2.EVENT_LBUTTONDOWN:
-        is_drawing = True
-        current_seat = [(x, y)]
+        drawing = True
+        ix, iy = x, y
 
-    elif event == cv2.EVENT_MOUSEMOVE and is_drawing:
-        temp_frame = frame.copy()
-        cv2.rectangle(temp_frame, current_seat[0], (x, y), (0, 255, 0), 2)
-        temp_frame = draw_text(temp_frame)
-        cv2.imshow('Mark Seats', temp_frame)
+    elif event == cv2.EVENT_MOUSEMOVE and drawing:
+        temp = frame.copy()
+        cv2.rectangle(temp, (ix, iy), (x, y), (0, 255, 0), 2)
+        for r in rectangles:
+            cv2.rectangle(temp, (r[0], r[1]), (r[2], r[3]), (0, 255, 0), 2)
+            cv2.putText(temp, f"Row {r[4]}", (r[0], r[1] - 5),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
+        cv2.imshow('Frame', temp)
 
     elif event == cv2.EVENT_LBUTTONUP:
-        is_drawing = False
-        current_seat.append((x, y))
-        x1, y1 = current_seat[0]
-        x2, y2 = current_seat[1]
-        seat_coords = {
-            "row": current_row,
-            "coords": [x1, y1, x2, y2]
-        }
-        seats.append(seat_coords)
-        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-        updated_frame = draw_text(frame.copy())
-        cv2.imshow('Mark Seats', updated_frame)
+        drawing = False
+        rectangles.append((ix, iy, x, y, current_row))
 
-# 显示当前排数的提示文字
-def draw_text(img):
-    # 转为PIL格式（RGB）
-    img_pil = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-    draw = ImageDraw.Draw(img_pil)
+# 加载并显示视频的第一帧
+def process_video(index):
+    global frame, rectangles, current_row, camera_index
 
-    # 加载中文字体（Windows系统一般有这些字体）
-    # 路径需要改成你系统上存在的字体文件路径
-    font_path = "C:/Windows/Fonts/simhei.ttf"
-    font = ImageFont.truetype(font_path, 24)  # 字体大小24
+    camera_index = index
+    video_path = video_paths[camera_index]
+    rectangles = []
+    current_row = 1
 
-    text = f"当前您标记的是第{current_row}排，按 'a' 切换下一排"
-    draw.text((20, 10), text, font=font, fill=(0, 255, 255, 255))
+    cap = cv2.VideoCapture(video_path)
+    ret, frame_read = cap.read()
+    cap.release()
 
-    # 转回OpenCV格式（BGR）
-    img = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
-    return img
+    if not ret:
+        print(f"❌ 无法读取视频：{video_path}")
+        return False
 
-# 打开视频并读取第一帧
-cap = cv2.VideoCapture('D:/creative/c_video2.MP4')
-ret, frame = cap.read()
-if not ret:
-    print("无法读取视频帧")
-    exit()
-frame = cv2.resize(frame, (640, 480))
-cap.release()
+   # frame_read = cv2.resize(frame_read, (CANVAS_WIDTH, CANVAS_HEIGHT))  # 统一尺寸（可选）
+    frame = frame_read.copy()
+    cv2.setMouseCallback('Frame', draw_rectangle)
 
-cv2.namedWindow('Mark Seats')
-cv2.setMouseCallback('Mark Seats', draw_seat)
+    print(f"🎥 当前摄像头：camera_{camera_index}（按 n 切换）")
+    return True
 
-# 显示初始提示
-init_display = draw_text(frame.copy())
-cv2.imshow('Mark Seats', init_display)
+# 保存当前摄像头的座位配置
+def save_current_seats():
+    global camera_index, rectangles, frame
 
-print("使用鼠标框选座位区域：")
-print(" - 按 'a' 切换到下一排")
-print(" - 按 's' 保存所有标记")
-print(" - 按 'q' 退出")
+    video_path = video_paths[camera_index]
+    cap = cv2.VideoCapture(video_path)
+    aspect_ratio = round(cap.get(cv2.CAP_PROP_FRAME_WIDTH) / cap.get(cv2.CAP_PROP_FRAME_HEIGHT), 10)
+    cap.release()
 
-while True:
-    key = cv2.waitKey(1) & 0xFF
+    key = f"camera_{camera_index}"
+    seat_config[key] = {
+        "video_path": video_path.replace("\\", "/"),
+        "seats": [],
+        "aspect_ratio": aspect_ratio
+    }
+    for r in rectangles:
+        seat_config[key]["seats"].append({
+            "coords": [r[0], r[1], r[2], r[3]],
+            "row": r[4]
+        })
 
-    if key == ord('a'):
-        current_row += 1
-        updated_frame = draw_text(frame.copy())
-        cv2.imshow('Mark Seats', updated_frame)
+    with open(config_path, "w", encoding="utf-8") as f:
+        json.dump(seat_config, f, indent=4)
+    print(f"✅ 已保存 camera_{camera_index} 到 seats_config.json")
 
-    elif key == ord('s'):
-        with open('seats_config.json', 'w', encoding='utf-8') as f:
-            json.dump(seats, f, indent=4, ensure_ascii=False)
-        print("座位区域已保存到 seats_config.json 文件中。")
+# 主程序
+def main():
+    global current_row, camera_index
 
-    elif key == ord('q'):
-        break
+    cv2.namedWindow('Frame')
 
-cv2.destroyAllWindows()
+    if not process_video(camera_index):
+        return
+
+    while True:
+        display = frame.copy()
+        for r in rectangles:
+            cv2.rectangle(display, (r[0], r[1]), (r[2], r[3]), (0, 255, 0), 2)
+            cv2.putText(display, f"Row {r[4]}", (r[0], r[1] - 5),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
+
+        # 显示当前状态文字
+        info_text = f"Camera: {camera_index} | Row: {current_row} | +:rows+1 -:rows-1 s:save n:next camera q:exit"
+        cv2.putText(display, info_text, (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 2)
+
+        cv2.imshow('Frame', display)
+        key = cv2.waitKey(10) & 0xFF
+
+        if key == ord('+'):
+            current_row += 1
+            print(f"➡️ 当前排数：{current_row}")
+
+        elif key == ord('-'):
+            current_row = max(1, current_row - 1)
+            print(f"⬅️ 当前排数：{current_row}")
+
+        elif key == ord('s'):
+            save_current_seats()
+
+        elif key == ord('n'):
+            camera_index += 1
+            if camera_index >= len(video_paths):
+                print("📽️ 所有摄像头已处理完毕。")
+                break
+            cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
+            if not process_video(camera_index):
+                break
+
+        elif key == ord('q'):
+            print("🛑 已退出程序")
+            break
+
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    main()
