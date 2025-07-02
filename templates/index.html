@@ -16,7 +16,6 @@
           <div class="dropdown-content">
             <div class="dropdown-item" onclick="selectPriority('available')">✅ 有座</div>
             <div class="dropdown-item" onclick="selectPriority('quiet')">🔇 无声</div>
-
             <div class="dropdown-item submenu">
               🔥 热门区域 ▶
               <div class="submenu-content">
@@ -25,7 +24,6 @@
                 <div onclick="selectPriority('hot_area_month')">📆 历史1月</div>
               </div>
             </div>
-
             <div class="dropdown-item submenu">
               ⏰ 热门时段 ▶
               <div class="submenu-content">
@@ -44,25 +42,35 @@
   <main class="main">
     <div class="card">
       <h2>教学楼</h2>
-      <a class="room" href="room.html?room=101">
-        <span class="room-number">101</span>
-        <span class="room-detail" id="room-101-detail">容量: 3/45 | 安静</span>
-      </a>
+
+      <div class="room">
+        <a href="room.html?room=101" class="room-number">101</a>
+        <div class="room-info">
+          <span class="room-detail" id="room-101-detail">容量: 3/45 | 安静</span>
+          <a class="time-link" href="/hot-times/101">查看热门时段</a>
+        </div>
+      </div>
       <hr />
-      <a class="room" href="room.html?room=102">
-        <span class="room-number">102</span>
-        <span class="room-detail" id="room-102-detail">容量: 1/40 | 嘈杂</span>
-      </a>
+
+      <div class="room">
+        <a href="room.html?room=102" class="room-number">102</a>
+        <div class="room-info">
+          <span class="room-detail" id="room-102-detail">容量: 1/40 | 嘈杂</span>
+          <a class="time-link" href="/hot-times/102">查看热门时段</a>
+        </div>
+      </div>
       <hr />
-      <a class="room" href="room.html?room=203">
-        <span class="room-number">203</span>
-        <span class="room-detail" id="room-203-detail">容量: 38/40 | 嘈杂</span>
-      </a>
+
+      <div class="room">
+        <a href="room.html?room=203" class="room-number">203</a>
+        <div class="room-info">
+          <span class="room-detail" id="room-203-detail">容量: 38/40 | 嘈杂</span>
+          <a class="time-link" href="/hot-times/203">查看热门时段</a>
+        </div>
+      </div>
     </div>
   </main>
 
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
-
-
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
