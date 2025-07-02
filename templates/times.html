@@ -16,7 +16,7 @@
       color: white;
       padding: 20px 40px;
       font-size: 26px;
-      font-weight: bold;  /* ✅ 标题加粗 */
+      font-weight: bold;
     }
     .main {
       display: flex;
@@ -40,6 +40,7 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
+      font-size: 14px;
     }
     th, td {
       padding: 10px;
@@ -55,6 +56,10 @@
       border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
+      transition: background 0.3s;
+    }
+    .btn:hover {
+      background-color: #357ab7;
     }
   </style>
 </head>
@@ -78,9 +83,16 @@
           </tr>
         </thead>
         <tbody>
-          {% for i in range(11) %}
+          {% set time_labels = [
+            "07:00–08:00", "08:00–09:00", "09:00–10:00", "10:00–11:00",
+            "11:00–12:00", "12:00–13:00", "13:00–14:00", "14:00–15:00",
+            "15:00–16:00", "16:00–17:00", "17:00–18:00", "18:00–19:00",
+            "19:00–20:00", "20:00–21:00", "21:00–22:00", "22:00–23:00"
+          ] %}
+
+          {% for i in range(16) %}
           <tr>
-            <td>第{{ i + 1 }}节</td>
+            <td>{{ time_labels[i] }}</td>
             {% for j in range(7) %}
               <td style="background-color: {{ heat_colors[i][j] }};"></td>
             {% endfor %}

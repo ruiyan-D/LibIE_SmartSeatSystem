@@ -60,7 +60,8 @@ def api_summary():
         return jsonify(summary)
 @app.route('/hot-times/<room_id>')
 def hot_times(room_id):
-    # 假设 11 节课 × 7 天的颜色矩阵
+    # 模拟 16 段 × 7 天（周一至周日）的颜色矩阵（用于热力图）
+    # 颜色深浅代表人数多少，白色表示无人，越红表示越多人
     heat_colors = [
         ["#ffffff", "#ffeeee", "#ffdddd", "#ffcccc", "#ffbbbb", "#ffeeee", "#ffffff"],
         ["#ffeeee"] * 7,
@@ -72,6 +73,11 @@ def hot_times(room_id):
         ["#ffffff"] * 7,
         ["#ffcccc"] * 7,
         ["#ffdddd"] * 7,
+        ["#ffbbbb"] * 7,
+        ["#ffaaaa"] * 7,
+        ["#ff8888"] * 7,
+        ["#ffaaaa"] * 7,
+        ["#ffeeee"] * 7,
         ["#ffffff"] * 7,
     ]
     return render_template("times.html", room_id=room_id, heat_colors=heat_colors)

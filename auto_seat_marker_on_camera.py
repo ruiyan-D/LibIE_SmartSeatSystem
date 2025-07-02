@@ -6,7 +6,7 @@ from ultralytics import YOLO
 model = YOLO('yolov8n.pt')
 
 # 初始化摄像头
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 assert cap.isOpened(), "无法打开摄像头"
 
 # 用于存储座位坐标
