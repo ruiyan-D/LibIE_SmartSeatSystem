@@ -3,50 +3,325 @@
         "1": [
             {
                 "coords": [
-                    77,
+                    44,
+                    83,
+                    70,
+                    124
+                ],
+                "status": "empty"
+            },
+            {
+                "coords": [
+                    95,
+                    83,
+                    110,
+                    120
+                ],
+                "status": "empty"
+            },
+            {
+                "coords": [
+                    136,
                     85,
-                    232,
-                    167
+                    160,
+                    131
                 ],
                 "status": "empty"
             },
             {
                 "coords": [
-                    328,
-                    97,
-                    489,
-                    171
+                    192,
+                    82,
+                    218,
+                    124
                 ],
                 "status": "empty"
             },
             {
                 "coords": [
-                    128,
-                    275,
-                    317,
-                    335
+                    243,
+                    81,
+                    267,
+                    121
                 ],
-                "status": "occupied"
+                "status": "empty"
+            },
+            {
+                "coords": [
+                    291,
+                    80,
+                    316,
+                    120
+                ],
+                "status": "empty"
+            },
+            {
+                "coords": [
+                    341,
+                    79,
+                    369,
+                    122
+                ],
+                "status": "empty"
+            },
+            {
+                "coords": [
+                    395,
+                    86,
+                    421,
+                    120
+                ],
+                "status": "empty"
+            },
+            {
+                "coords": [
+                    444,
+                    84,
+                    469,
+                    122
+                ],
+                "status": "empty"
+            },
+            {
+                "coords": [
+                    494,
+                    83,
+                    520,
+                    119
+                ],
+                "status": "empty"
+            },
+            {
+                "coords": [
+                    550,
+                    80,
+                    570,
+                    112
+                ],
+                "status": "empty"
+            },
+            {
+                "coords": [
+                    587,
+                    86,
+                    608,
+                    117
+                ],
+                "status": "empty"
             }
         ],
         "2": [
             {
                 "coords": [
-                    84,
-                    372,
-                    253,
-                    431
+                    40,
+                    162,
+                    69,
+                    189
+                ],
+                "status": "item_only"
+            },
+            {
+                "coords": [
+                    88,
+                    156,
+                    110,
+                    188
+                ],
+                "status": "item_only"
+            },
+            {
+                "coords": [
+                    134,
+                    160,
+                    159,
+                    184
+                ],
+                "status": "item_only"
+            },
+            {
+                "coords": [
+                    188,
+                    156,
+                    209,
+                    184
+                ],
+                "status": "empty"
+            },
+            {
+                "coords": [
+                    40,
+                    211,
+                    63,
+                    251
+                ],
+                "status": "item_only"
+            },
+            {
+                "coords": [
+                    90,
+                    212,
+                    115,
+                    244
+                ],
+                "status": "item_only"
+            },
+            {
+                "coords": [
+                    145,
+                    215,
+                    164,
+                    248
+                ],
+                "status": "item_only"
+            }
+        ],
+        "3": [
+            {
+                "coords": [
+                    42,
+                    276,
+                    73,
+                    307
+                ],
+                "status": "item_only"
+            },
+            {
+                "coords": [
+                    101,
+                    284,
+                    148,
+                    304
+                ],
+                "status": "item_only"
+            },
+            {
+                "coords": [
+                    179,
+                    276,
+                    210,
+                    304
+                ],
+                "status": "empty"
+            },
+            {
+                "coords": [
+                    238,
+                    264,
+                    260,
+                    295
+                ],
+                "status": "occupied"
+            }
+        ],
+        "4": [
+            {
+                "coords": [
+                    311,
+                    260,
+                    336,
+                    300
                 ],
                 "status": "occupied"
             },
             {
                 "coords": [
-                    405,
-                    364,
-                    574,
-                    415
+                    367,
+                    264,
+                    387,
+                    300
+                ],
+                "status": "occupied"
+            },
+            {
+                "coords": [
+                    410,
+                    271,
+                    436,
+                    298
+                ],
+                "status": "occupied"
+            },
+            {
+                "coords": [
+                    469,
+                    265,
+                    488,
+                    300
+                ],
+                "status": "occupied"
+            }
+        ],
+        "5": [
+            {
+                "coords": [
+                    113,
+                    339,
+                    144,
+                    360
+                ],
+                "status": "item_only"
+            }
+        ],
+        "6": [
+            {
+                "coords": [
+                    192,
+                    344,
+                    217,
+                    368
                 ],
                 "status": "empty"
+            }
+        ],
+        "7": [
+            {
+                "coords": [
+                    255,
+                    337,
+                    287,
+                    375
+                ],
+                "status": "occupied"
+            }
+        ],
+        "8": [
+            {
+                "coords": [
+                    321,
+                    337,
+                    344,
+                    369
+                ],
+                "status": "occupied"
+            }
+        ],
+        "9": [
+            {
+                "coords": [
+                    373,
+                    336,
+                    395,
+                    369
+                ],
+                "status": "occupied"
+            },
+            {
+                "coords": [
+                    424,
+                    334,
+                    449,
+                    364
+                ],
+                "status": "occupied"
+            },
+            {
+                "coords": [
+                    468,
+                    331,
+                    488,
+                    364
+                ],
+                "status": "occupied"
             }
         ]
     }

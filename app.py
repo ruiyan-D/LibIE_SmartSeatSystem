@@ -27,21 +27,6 @@ def update_seat_status():
         time.sleep(0.1)
 
 
-def calculate_grid_layout(seats):
-    rows = {}
-    for seat_id, info in seats.items():
-        row_key = info.get("row", 0)  # 直接使用 row 字段
-        if row_key not in rows:
-            rows[row_key] = []
-        rows[row_key].append((seat_id, info["coords"], info["status"]))
-
-    # 排序：行号从大到小（摄像头最下为第1排）
-    sorted_rows = sorted(rows.items(), reverse=True)
-    grid = [sorted(seat_list, key=lambda s: s[1][0]) for _, seat_list in sorted_rows]
-    return grid
-
-
-
 threading.Thread(target=update_seat_status, daemon=True).start()
 
 
@@ -52,11 +37,6 @@ def index():
 def room_page():
     return render_template("room.html")
 
-@app.route('/api/seat_status')
-def get_seat_status():
-    with data_lock:
-        grid_layout = calculate_grid_layout(seat_status)
-        return jsonify(grid_layout)
 @app.route("/api/seat_status_raw/<camera_id>")
 def api_seat_status_raw(camera_id):
     with data_lock:

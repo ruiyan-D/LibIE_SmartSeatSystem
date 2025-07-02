@@ -42,7 +42,7 @@
       border-radius: 20px;
       padding: 30px 50px;
       width: 90%;
-      max-width: 800px;
+      max-width: 1000px; /* 加宽容器 */
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
       text-align: center;
     }
@@ -55,15 +55,15 @@
     }
 
     .seat {
-      width: 80px;
-      height: 80px;
-      border-radius: 12px;
+      width: 65px; /* 缩小座位宽度 */
+      height: 65px; /* 缩小座位高度 */
+      border-radius: 10px; /* 减小圆角 */
       color: white;
       display: flex;
       justify-content: center;
       align-items: center;
       font-weight: bold;
-      font-size: 16px;
+      font-size: 14px; /* 减小字体大小 */
       cursor: pointer;
     }
 
@@ -72,40 +72,50 @@
     .empty { background: green; }
 
     .legend {
-      margin-top: 50px;
+      margin-top: 30px; /* 减小图例上边距 */
       display: inline-block;
       background: rgba(255, 255, 255, 0.9);
-      padding: 12px 30px;
-      border-radius: 16px;
-      font-size: 14px;
+      padding: 10px 25px; /* 减小内边距 */
+      border-radius: 14px; /* 减小圆角 */
+      font-size: 13px; /* 减小字体大小 */
     }
 
     .legend span {
       display: inline-block;
-      margin: 0 10px;
+      margin: 0 8px; /* 减小间距 */
     }
 
     .legend .color-box {
       display: inline-block;
-      width: 14px;
-      height: 14px;
-      margin-right: 5px;
-      border-radius: 3px;
+      width: 12px; /* 减小尺寸 */
+      height: 12px; /* 减小尺寸 */
+      margin-right: 4px; /* 减小间距 */
+      border-radius: 2px; /* 减小圆角 */
     }
 
     .back-btn {
-      margin-top: 20px;
+      margin-top: 15px; /* 减小上边距 */
       display: inline-block;
       background: #4a90e2;
       color: white;
-      padding: 8px 20px;
-      border-radius: 8px;
+      padding: 7px 18px; /* 减小内边距 */
+      border-radius: 6px; /* 减小圆角 */
       text-decoration: none;
       transition: background 0.3s;
+      font-size: 14px; /* 减小字体大小 */
     }
 
     .back-btn:hover {
       background: #357ab7;
+    }
+
+    /* 新添加的样式 */
+    .row-container {
+      margin-bottom: 10px !important; /* 减小排间距 */
+    }
+
+    .row-label {
+      margin-bottom: 5px !important; /* 减小排标签下边距 */
     }
 
   </style>
@@ -156,17 +166,75 @@ function loadSeatStatus() {
       const seatsDiv = document.getElementById('seats');
       seatsDiv.innerHTML = "";
 
-      const sortedRows = Object.entries(data).sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
+      // 将排号转换为数字进行排序
+      const sortedRows = Object.entries(data).sort((a, b) => {
+        const rowA = parseInt(a[0]);
+        const rowB = parseInt(b[0]);
+        return rowB - rowA; // 从大到小排序（R2在R1上方）
+      });
+
+      // 创建主容器
+      const mainContainer = document.createElement('div');
+      mainContainer.style.display = 'flex';
+      mainContainer.style.flexDirection = 'column';
+      mainContainer.style.alignItems = 'center';
+      mainContainer.style.width = '100%';
 
       sortedRows.forEach(([row, seatList]) => {
+        // 每排创建一个行容器
+        const rowContainer = document.createElement('div');
+        rowContainer.className = 'row-container';
+        rowContainer.style.display = 'flex';
+        rowContainer.style.flexWrap = 'wrap';
+        rowContainer.style.justifyContent = 'center';
+        rowContainer.style.marginBottom = '10px'; // 减小排间距
+        rowContainer.style.width = '100%';
+
+        // 添加排号标签
+        const rowLabel = document.createElement('div');
+        rowLabel.className = 'row-label';
+        rowLabel.textContent = `第 ${row} 排`;
+        rowLabel.style.width = '100%';
+        rowLabel.style.textAlign = 'center';
+        rowLabel.style.marginBottom = '5px'; // 减小标签下边距
+        rowLabel.style.fontWeight = 'bold';
+        rowLabel.style.fontSize = '1.1em'; // 减小字体大小
+        mainContainer.appendChild(rowLabel);
+
+        // 按x坐标从左到右排序座位
         seatList.sort((s1, s2) => s1.coords[0] - s2.coords[0]);
+
         seatList.forEach((seat, idx) => {
-          const div = document.createElement('div');
-          div.className = `seat ${seat.status}`;
-          div.textContent = `R${row}_S${idx + 1}`;
-          seatsDiv.appendChild(div);
+          const seatDiv = document.createElement('div');
+          seatDiv.className = `seat ${seat.status}`;
+          seatDiv.textContent = `R${row}_S${idx + 1}`;
+
+          // 添加基本样式（已通过CSS设置尺寸）
+          seatDiv.style.margin = '3px'; // 减小座位间距
+          seatDiv.style.padding = '5px'; // 减小内边距
+          seatDiv.style.cursor = 'pointer';
+          seatDiv.style.transition = 'transform 0.2s';
+          seatDiv.style.display = 'flex';
+          seatDiv.style.alignItems = 'center';
+          seatDiv.style.justifyContent = 'center';
+          seatDiv.style.textAlign = 'center';
+
+          // 悬停效果
+          seatDiv.addEventListener('mouseenter', () => {
+            seatDiv.style.transform = 'scale(1.05)';
+          });
+
+          seatDiv.addEventListener('mouseleave', () => {
+            seatDiv.style.transform = 'scale(1)';
+          });
+
+          rowContainer.appendChild(seatDiv);
         });
+
+        mainContainer.appendChild(rowContainer);
       });
+
+      seatsDiv.appendChild(mainContainer);
     });
 }
 
@@ -175,7 +243,6 @@ loadSeatStatus();
 
 // 每 2 秒刷新一次
 setInterval(loadSeatStatus, 2000);
-
 </script>
 
 </body>
