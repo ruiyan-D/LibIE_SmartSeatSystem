@@ -58,7 +58,23 @@ def api_summary():
                 "occupied": occupied
             }
         return jsonify(summary)
-
+@app.route('/hot-times/<room_id>')
+def hot_times(room_id):
+    # 假设 11 节课 × 7 天的颜色矩阵
+    heat_colors = [
+        ["#ffffff", "#ffeeee", "#ffdddd", "#ffcccc", "#ffbbbb", "#ffeeee", "#ffffff"],
+        ["#ffeeee"] * 7,
+        ["#ffdddd"] * 7,
+        ["#ffcccc"] * 7,
+        ["#ff9999"] * 7,
+        ["#ffaaaa"] * 7,
+        ["#ffeeee"] * 7,
+        ["#ffffff"] * 7,
+        ["#ffcccc"] * 7,
+        ["#ffdddd"] * 7,
+        ["#ffffff"] * 7,
+    ]
+    return render_template("times.html", room_id=room_id, heat_colors=heat_colors)
 
 
 if __name__ == '__main__':
