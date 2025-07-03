@@ -4,6 +4,8 @@ import threading
 import time
 import csv
 from datetime import datetime, timedelta
+import sounddevice as sd
+import numpy as np
 
 app = Flask(__name__)
 
@@ -19,6 +21,17 @@ CACHE_UPDATE_INTERVAL = 600  # 秒
 OCCUPANCY_LOG_FILE = 'occupancy_log.csv'
 
 status_path = "seat_status_on_video.json"
+
+# 假设有多个教室，每个教室对应一个麦克风设备索引
+CLASSROOM_MIC_DEVICES = {
+    'classroom_1': 0,  # 设备索引0
+    'classroom_2': 1,  # 设备索引1
+    # 可继续添加更多教室
+}
+
+# 每个教室的噪声状态
+multi_noise_status = {name: {'status': '安静', 'db': 0.0} for name in CLASSROOM_MIC_DEVICES}
+noise_lock = threading.Lock()
 
 def update_seat_status():
     global seat_status
@@ -80,6 +93,27 @@ def hot_analysis_worker():
     while True:
         analyze_hot_area_and_time()
         time.sleep(CACHE_UPDATE_INTERVAL)
+
+def noise_monitor_classroom(classroom, device):
+    def callback(indata, frames, time, status):
+        db = get_db(indata)
+        status_str = '安静' if db <= 40 else '嘈杂'
+        with noise_lock:
+            multi_noise_status[classroom]['status'] = status_str
+            multi_noise_status[classroom]['db'] = float(db)
+        print(f"{classroom} 当前分贝: {db:.2f}，状态: {status_str}")
+    with sd.InputStream(callback=callback, channels=1, samplerate=44100, blocksize=1024, device=device):
+        while True:
+            sd.sleep(1000)
+
+def get_db(audio):
+    rms = np.sqrt(np.mean(np.square(audio)))
+    db = 20 * np.log10(rms + 1e-6) + 100
+    return db
+
+# 启动每个教室的噪声监测线程
+for classroom, device in CLASSROOM_MIC_DEVICES.items():
+    threading.Thread(target=noise_monitor_classroom, args=(classroom, device), daemon=True).start()
 
 threading.Thread(target=update_seat_status, daemon=True).start()
 threading.Thread(target=hot_analysis_worker, daemon=True).start()
@@ -161,6 +195,23 @@ def clear_hot_cache():
         hot_area_today_cache = []
         hot_time_today_cache = []
     return jsonify({'status': 'ok', 'msg': '缓存已清空'})
+
+@app.route('/api/noise_status')
+def get_noise_status():
+    try:
+        with noise_lock:
+            # 返回所有教室的噪声状态
+            return jsonify({
+                'status': 'success',
+                'data': multi_noise_status,
+                'timestamp': time.time()
+            })
+    except Exception as e:
+        print(f"获取噪音状态出错: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': '无法获取噪音状态'
+        }), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

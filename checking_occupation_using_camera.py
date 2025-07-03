@@ -189,13 +189,11 @@ while True:
         if frame is None:
             continue
 
-        # 获取配置中的宽高比
-        config_ar = seats_config[cam_id].get("aspect_ratio", 1.33)
-        h, w = frame.shape[:2]
+        h, w = frame.shape[:2]  # type: ignore
         actual_ar = w / h
 
         # 计算缩放比例
-        scale_x = w / (config_ar * h) if h > 0 else 1.0
+        scale_x = w / (actual_ar * h) if h > 0 else 1.0
         scale_y = 1.0
 
         # 复制帧用于处理
@@ -303,7 +301,7 @@ while True:
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 200, 255), 2)
 
         # 将帧缩放到格子大小，保持比例
-        h, w = display_frame.shape[:2]
+        h, w = display_frame.shape[:2]  # type: ignore
         aspect_ratio = w / h
 
         # 计算缩放后尺寸

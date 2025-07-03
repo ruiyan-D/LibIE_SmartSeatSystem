@@ -69,8 +69,57 @@
         </div>
       </div>
     </div>
+    <div id="multi-noise-status" style="margin-top: 30px;"></div>
   </main>
 
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script>
+    async function fetchNoiseStatus() {
+      try {
+        const res = await fetch('/api/noise_status?_t=' + Date.now());
+        const data = await res.json();
+        console.log('noise_status返回', data);
+        const container = document.getElementById('multi-noise-status');
+        container.innerHTML = '';
+        if (data && data.data) {
+          for (const [classroom, info] of Object.entries(data.data)) {
+            let status = info.status;
+            let div = document.createElement('div');
+            div.style.display = 'inline-block';
+            div.style.margin = '0 20px 10px 0';
+            div.style.padding = '12px 30px';
+            div.style.fontSize = '22px';
+            div.style.fontWeight = 'bold';
+            div.style.borderRadius = '12px';
+            div.style.boxShadow = '0 0 8px rgba(0,0,0,0.08)';
+            div.style.minWidth = '120px';
+            div.style.textAlign = 'center';
+            if (status === '安静') {
+              div.textContent = `${classroom}：安静`;
+              div.style.background = 'rgba(200,255,200,0.7)';
+              div.style.color = '#228B22';
+              div.style.border = '2px solid #228B22';
+            } else if (status === '嘈杂') {
+              div.textContent = `${classroom}：嘈杂`;
+              div.style.background = 'rgba(255,200,200,0.7)';
+              div.style.color = '#B22222';
+              div.style.border = '2px solid #B22222';
+            } else {
+              div.textContent = `${classroom}：--`;
+              div.style.background = 'rgba(255,255,255,0.7)';
+              div.style.color = '#222';
+              div.style.border = '2px solid #ccc';
+            }
+            container.appendChild(div);
+          }
+        }
+      } catch (err) {
+        const container = document.getElementById('multi-noise-status');
+        container.innerHTML = '<div style="background:rgba(255,255,255,0.7);color:#222;border:2px solid #ccc;padding:12px 30px;border-radius:12px;display:inline-block;">噪声状态获取失败</div>';
+      }
+    }
+    fetchNoiseStatus();
+    setInterval(fetchNoiseStatus, 2000);
+  </script>
 </body>
 </html>
