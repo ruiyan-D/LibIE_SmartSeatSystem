@@ -149,15 +149,16 @@
   </div>
 <script>
 const roomToCamera = {
-  "101": "camera_0",
-  "102": "camera_1",
-  "203": "camera_2"
+  "1": "camera_0",
+  "2": "camera_1",
+  "3": "camera_2"
 };
 
 const params = new URLSearchParams(location.search);
 const room = params.get("room");
 const cameraId = roomToCamera[room];
-document.querySelector('.header h1').textContent = `教室 ${room} 座位详情`;
+const roomName = cameraToRoom[cameraId];
+document.querySelector('.header h1').textContent = `教室 ${roomName} 座位详情`;
 
 function loadSeatStatus() {
   fetch(`/api/seat_status_raw/${cameraId}`)

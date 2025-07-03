@@ -162,5 +162,39 @@ def clear_hot_cache():
         hot_time_today_cache = []
     return jsonify({'status': 'ok', 'msg': '缓存已清空'})
 
+@app.route('/api/room_heatmap/<room_id>')
+def api_room_heatmap(room_id):
+    # 如果 room_id 没有 'camera_' 前缀，自动加上
+    if not room_id.startswith('camera_'):
+        room_id = f'camera_{room_id}'
+    # ...后续逻辑不变...
+    # 1. 初始化16x7矩阵
+    matrix = [[[] for _ in range(7)] for _ in range(16)]
+    try:
+        with open('occupancy_log.csv', 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if row['camera_id'] != room_id:
+                    continue
+                ts = datetime.strptime(row['timestamp'], '%Y-%m-%d %H:%M:%S')
+                weekday = ts.weekday()  # 0=周一
+                hour = ts.hour
+                # 计算属于哪个时段
+                slot = hour - 7  # 07:00–08:00为第0段
+                if 0 <= slot < 16:
+                    occ = float(row['occupancy_rate_percent'])
+                    matrix[slot][weekday].append(occ)
+        # 计算每格平均值
+        avg_matrix = [
+            [
+                round(sum(cell)/len(cell), 2) if cell else 0
+                for cell in row
+            ] for row in matrix
+        ]
+        return jsonify({'occupancy_matrix': avg_matrix})
+    except Exception as e:
+        print("生成热力图数据出错:", e)
+        return jsonify({'occupancy_matrix': [[0]*7 for _ in range(16)]})
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

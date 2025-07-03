@@ -62,13 +62,48 @@
       background-color: #357ab7;
     }
   </style>
+  <script>
+    const cameraToRoom = {
+  "0": "101",
+  "1": "102",
+  "2": "203"
+};
+const roomName = cameraToRoom[room_id];
+
+  function getColor(rate) {
+    // 0% 白色，100% 红色
+    if (rate === 0) return "#ffffff";
+    // 线性插值：0%白，100%红
+    let r = 255, g = Math.round(255 - rate * 1.5), b = Math.round(255 - rate * 1.5);
+    if (g < 100) g = 100; if (b < 100) b = 100;
+    return `rgb(${r},${g},${b})`;
+  }
+  window.onload = function() {
+    const room_id = "{{ room_id }}";
+  
+    fetch(`/api/room_heatmap/${room_id}`)
+      .then(res => res.json())
+      .then(data => {
+        const matrix = data.occupancy_matrix;
+        for (let i = 0; i < 16; i++) {
+          for (let j = 0; j < 7; j++) {
+            const cell = document.getElementById(`cell-${i}-${j}`);
+            if (cell) {
+              cell.style.backgroundColor = getColor(matrix[i][j]);
+              cell.title = matrix[i][j] + "%";
+            }
+          }
+        }
+      });
+  }
+  </script>
 </head>
 <body>
   <div class="header">热门时段查看</div>
 
   <div class="main">
     <div class="card">
-      <h2>教室 {{ room_id }}</h2>
+      <h2>教室 {{ roomName }}</h2>
       <table>
         <thead>
           <tr>
@@ -89,12 +124,11 @@
             "15:00–16:00", "16:00–17:00", "17:00–18:00", "18:00–19:00",
             "19:00–20:00", "20:00–21:00", "21:00–22:00", "22:00–23:00"
           ] %}
-
           {% for i in range(16) %}
           <tr>
             <td>{{ time_labels[i] }}</td>
             {% for j in range(7) %}
-              <td style="background-color: {{ heat_colors[i][j] }};"></td>
+              <td id="cell-{{i}}-{{j}}"></td>
             {% endfor %}
           </tr>
           {% endfor %}
