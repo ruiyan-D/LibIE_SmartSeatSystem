@@ -1,6 +1,7 @@
 import cv2
 import os
 import json
+
 CANVAS_WIDTH = 1080
 CANVAS_HEIGHT = 720
 
@@ -29,6 +30,13 @@ current_row = 1
 frame = None
 camera_index = 0
 
+# 颜色循环定义（绿色、黄色、蓝色）
+ROW_COLORS = [
+    (0, 255, 0),      # 绿色
+    (0, 255, 255),    # 黄色
+    (255, 0, 0)       # 蓝色
+]
+
 # 鼠标事件回调
 def draw_rectangle(event, x, y, flags, param):
     global ix, iy, drawing, rectangles, frame
@@ -41,9 +49,10 @@ def draw_rectangle(event, x, y, flags, param):
         temp = frame.copy()
         cv2.rectangle(temp, (ix, iy), (x, y), (0, 255, 0), 2)
         for r in rectangles:
-            cv2.rectangle(temp, (r[0], r[1]), (r[2], r[3]), (0, 255, 0), 2)
+            color = ROW_COLORS[(r[4] - 1) % len(ROW_COLORS)]
+            cv2.rectangle(temp, (r[0], r[1]), (r[2], r[3]), color, 2)
             cv2.putText(temp, f"Row {r[4]}", (r[0], r[1] - 5),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
         cv2.imshow('Frame', temp)
 
     elif event == cv2.EVENT_LBUTTONUP:
@@ -67,7 +76,6 @@ def process_video(index):
         print(f"❌ 无法读取视频：{video_path}")
         return False
 
-   # frame_read = cv2.resize(frame_read, (CANVAS_WIDTH, CANVAS_HEIGHT))  # 统一尺寸（可选）
     frame = frame_read.copy()
     cv2.setMouseCallback('Frame', draw_rectangle)
 
@@ -101,7 +109,7 @@ def save_current_seats():
 
 # 主程序
 def main():
-    global current_row, camera_index
+    global current_row, camera_index, rectangles
 
     cv2.namedWindow('Frame')
 
@@ -111,24 +119,54 @@ def main():
     while True:
         display = frame.copy()
         for r in rectangles:
-            cv2.rectangle(display, (r[0], r[1]), (r[2], r[3]), (0, 255, 0), 2)
+            color = ROW_COLORS[(r[4] - 1) % len(ROW_COLORS)]
+            cv2.rectangle(display, (r[0], r[1]), (r[2], r[3]), color, 2)
             cv2.putText(display, f"Row {r[4]}", (r[0], r[1] - 5),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2, cv2.LINE_AA)
 
-        # 显示当前状态文字
-        info_text = f"Camera: {camera_index} | Row: {current_row} | +:rows+1 -:rows-1 s:save n:next camera q:exit"
-        cv2.putText(display, info_text, (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 2)
+        # === 顶部中央摄像头名称 ===
+        camera_label = f"camera_{camera_index}"
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        text_scale = 1.2
+        thickness = 3
+        text_color = (255, 255, 255)
+
+        (text_width, text_height), _ = cv2.getTextSize(camera_label, font, text_scale, thickness)
+        text_x = (display.shape[1] - text_width) // 2
+        text_y = text_height + 10  # 距离顶部10像素
+
+        cv2.putText(display, camera_label, (text_x, text_y), font, text_scale, text_color, thickness, cv2.LINE_AA)
+
+        # === 左上角状态说明文字（黑色） ===
+        info_texts = [
+            "a: the number of rows increases",
+            "z: the number of rows decreases",
+            "c: reset the current mark",
+            "s: save the current mark",
+            "n: next video",
+            "q: exit"
+        ]
+
+        y0 = 50  # 避开顶部标题
+        for i, text in enumerate(info_texts):
+            y = y0 + i * 25
+            cv2.putText(display, text, (10, y),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 0), 2, cv2.LINE_AA)
 
         cv2.imshow('Frame', display)
         key = cv2.waitKey(10) & 0xFF
 
-        if key == ord('+'):
+        if key == ord('a'):
             current_row += 1
             print(f"➡️ 当前排数：{current_row}")
 
-        elif key == ord('-'):
+        elif key == ord('z'):
             current_row = max(1, current_row - 1)
             print(f"⬅️ 当前排数：{current_row}")
+
+        elif key == ord('c'):
+            rectangles = []
+            print(f"♻️ 已重置 camera_{camera_index} 的标定数据")
 
         elif key == ord('s'):
             save_current_seats()

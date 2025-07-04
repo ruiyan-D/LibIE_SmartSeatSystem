@@ -139,7 +139,22 @@
     </div>
   </div>
 
-  <!-- 占座超时提示框 -->
+
+
+  <script>
+    const roomToCamera = {
+      "101": "camera_0",
+      "102": "camera_1",
+      "203": "camera_2"
+    };
+
+    const params = new URLSearchParams(location.search);
+    const room = params.get("room");
+    const cameraId = roomToCamera[room];
+    document.querySelector('.header h1').textContent = `教室 ${room} 座位详情`;
+
+    let previousSeatStates = {};
+      <!-- 占座超时提示框 -->
   <div id="timeout-alert" style="
     display: none;
     position: fixed;
@@ -156,20 +171,6 @@
   ">
     占座超时,请及时移除物品！
   </div>
-
-  <script>
-    const roomToCamera = {
-      "101": "camera_0",
-      "102": "camera_1",
-      "203": "camera_2"
-    };
-
-    const params = new URLSearchParams(location.search);
-    const room = params.get("room");
-    const cameraId = roomToCamera[room];
-    document.querySelector('.header h1').textContent = `教室 ${room} 座位详情`;
-
-    let previousSeatStates = {};
 
     function loadSeatStatus() {
       fetch(`/api/seat_status_raw/${cameraId}`)
