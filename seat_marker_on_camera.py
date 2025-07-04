@@ -10,7 +10,7 @@ camera_ids = [0, 1, 2]  # 初始摄像头ID列表，可扩展
 
 # 尝试初始化所有摄像头
 for cam_id in camera_ids:
-    cap = cv2.VideoCapture(cam_id)
+    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
     if cap.isOpened():
         # 获取实际分辨率以计算宽高比
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -151,21 +151,19 @@ def mouse_callback(event, x, y, flags, param):
         end_point = (orig_x, orig_y)
 
         # 确保坐标正确排序 (左上角到右下角)
-        x1, y1 = min(start_point[0], end_point[0]), min(start_point[1], end_point[1])
-        x2, y2 = max(start_point[0], end_point[0]), max(start_point[1], end_point[1])
-
-        # 保存座位坐标和排数
-        seat_data = {
-            "coords": [x1, y1, x2, y2],
-            "row": current_row  # 添加排数信息
-        }
-        cameras[current_cam_idx]["seats"].append(seat_data)
-
-        print(f"摄像头 {current_cam_idx} 第{current_row}排添加座位: [{x1}, {y1}, {x2}, {y2}]")
-
-        # 重置点
-        start_point = None
-        end_point = None
+        if start_point is not None and end_point is not None:
+            x1, y1 = min(start_point[0], end_point[0]), min(start_point[1], end_point[1])
+            x2, y2 = max(start_point[0], end_point[0]), max(start_point[1], end_point[1])
+            # 保存座位坐标和排数
+            seat_data = {
+                "coords": [x1, y1, x2, y2],
+                "row": current_row
+            }
+            cameras[current_cam_idx]["seats"].append(seat_data)
+            print(f"摄像头 {current_cam_idx} 第{current_row}排添加座位: [{x1}, {y1}, {x2}, {y2}]")
+            # 重置点
+            start_point = None
+            end_point = None
 
 
 def display_to_original_coords(display_x, display_y):
@@ -247,7 +245,7 @@ def add_camera(cam_id):
             print(f"摄像头 {cam_id} 已存在")
             return False
 
-    cap = cv2.VideoCapture(cam_id)
+    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
     if cap.isOpened():
         # 获取实际分辨率以计算宽高比
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
