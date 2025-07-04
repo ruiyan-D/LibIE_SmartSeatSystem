@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
+item_only_timers = {}  # 记录物品占座的时间
+ITEM_ONLY_TIMEOUT = timedelta(seconds=10) 
 seat_status = {}
 data_lock = threading.Lock()
 
@@ -18,7 +20,7 @@ CACHE_UPDATE_INTERVAL = 600  # 秒
 
 OCCUPANCY_LOG_FILE = 'occupancy_log.csv'
 
-status_path = "seat_status_on_video.json"
+status_path = "seat_status_on_camera.json"
 
 def update_seat_status():
     global seat_status
