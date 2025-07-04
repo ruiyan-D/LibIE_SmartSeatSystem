@@ -42,7 +42,7 @@
       border-radius: 20px;
       padding: 30px 50px;
       width: 90%;
-      max-width: 1000px; /* 加宽容器 */
+      max-width: 1000px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
       text-align: center;
     }
@@ -55,15 +55,15 @@
     }
 
     .seat {
-      width: 65px; /* 缩小座位宽度 */
-      height: 65px; /* 缩小座位高度 */
-      border-radius: 10px; /* 减小圆角 */
+      width: 65px;
+      height: 65px;
+      border-radius: 10px;
       color: white;
       display: flex;
       justify-content: center;
       align-items: center;
       font-weight: bold;
-      font-size: 14px; /* 减小字体大小 */
+      font-size: 14px;
       cursor: pointer;
     }
 
@@ -72,178 +72,189 @@
     .empty { background: green; }
 
     .legend {
-      margin-top: 30px; /* 减小图例上边距 */
+      margin-top: 30px;
       display: inline-block;
       background: rgba(255, 255, 255, 0.9);
-      padding: 10px 25px; /* 减小内边距 */
-      border-radius: 14px; /* 减小圆角 */
-      font-size: 13px; /* 减小字体大小 */
+      padding: 10px 25px;
+      border-radius: 14px;
+      font-size: 13px;
     }
 
     .legend span {
       display: inline-block;
-      margin: 0 8px; /* 减小间距 */
+      margin: 0 8px;
     }
 
     .legend .color-box {
       display: inline-block;
-      width: 12px; /* 减小尺寸 */
-      height: 12px; /* 减小尺寸 */
-      margin-right: 4px; /* 减小间距 */
-      border-radius: 2px; /* 减小圆角 */
+      width: 12px;
+      height: 12px;
+      margin-right: 4px;
+      border-radius: 2px;
     }
 
     .back-btn {
-      margin-top: 15px; /* 减小上边距 */
+      margin-top: 15px;
       display: inline-block;
       background: #4a90e2;
       color: white;
-      padding: 7px 18px; /* 减小内边距 */
-      border-radius: 6px; /* 减小圆角 */
+      padding: 7px 18px;
+      border-radius: 6px;
       text-decoration: none;
       transition: background 0.3s;
-      font-size: 14px; /* 减小字体大小 */
+      font-size: 14px;
     }
 
     .back-btn:hover {
       background: #357ab7;
     }
 
-    /* 新添加的样式 */
     .row-container {
-      margin-bottom: 10px !important; /* 减小排间距 */
+      margin-bottom: 10px !important;
     }
 
     .row-label {
-      margin-bottom: 5px !important; /* 减小排标签下边距 */
+      margin-bottom: 5px !important;
     }
-
   </style>
 </head>
 <body>
-
-  <!-- 顶栏 -->
   <div class="header">
     <h1>教室 101 座位详情</h1>
     <div class="decibel">实时分贝：45 dB</div>
   </div>
 
-  <!-- 内容区 -->
   <div class="main">
     <div class="card">
-      <!-- 这里动态生成座位 -->
       <div class="seats" id="seats"></div>
 
-      <!-- 底部颜色说明 -->
       <div class="legend">
         <span><span class="color-box" style="background: green;"></span> 空闲</span>
         <span><span class="color-box" style="background: red;"></span> 占用</span>
         <span><span class="color-box" style="background: orange;"></span> 物品占座</span>
       </div>
 
-      <!-- 返回主页按钮 -->
       <br>
       <a href="{{ url_for('index') }}" class="back-btn">返回主页</a>
-
     </div>
   </div>
-<script>
-const roomToCamera = {
-  "101": "camera_0",
-  "102": "camera_1",
-  "203": "camera_2"
-};
 
-const params = new URLSearchParams(location.search);
-const room = params.get("room");
-const cameraId = roomToCamera[room];
-document.querySelector('.header h1').textContent = `教室 ${room} 座位详情`;
+  <!-- 占座超时提示框 -->
+  <div id="timeout-alert" style="
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(234, 255, 0, 0.9);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    z-index: 9999;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  ">
+    占座超时,请及时移除物品！
+  </div>
 
-function loadSeatStatus() {
-  fetch(`/api/seat_status_raw/${cameraId}`)
-    .then(res => res.json())
-    .then(data => {
-      const seatsDiv = document.getElementById('seats');
-      seatsDiv.innerHTML = "";
+  <script>
+    const roomToCamera = {
+      "101": "camera_0",
+      "102": "camera_1",
+      "203": "camera_2"
+    };
 
-      // 将排号转换为数字进行排序
-      const sortedRows = Object.entries(data).sort((a, b) => {
-        const rowA = parseInt(a[0]);
-        const rowB = parseInt(b[0]);
-        return rowB - rowA; // 从大到小排序（R2在R1上方）
-      });
+    const params = new URLSearchParams(location.search);
+    const room = params.get("room");
+    const cameraId = roomToCamera[room];
+    document.querySelector('.header h1').textContent = `教室 ${room} 座位详情`;
 
-      // 创建主容器
-      const mainContainer = document.createElement('div');
-      mainContainer.style.display = 'flex';
-      mainContainer.style.flexDirection = 'column';
-      mainContainer.style.alignItems = 'center';
-      mainContainer.style.width = '100%';
+    let previousSeatStates = {};
 
-      sortedRows.forEach(([row, seatList]) => {
-        // 每排创建一个行容器
-        const rowContainer = document.createElement('div');
-        rowContainer.className = 'row-container';
-        rowContainer.style.display = 'flex';
-        rowContainer.style.flexWrap = 'wrap';
-        rowContainer.style.justifyContent = 'center';
-        rowContainer.style.marginBottom = '10px'; // 减小排间距
-        rowContainer.style.width = '100%';
+    function loadSeatStatus() {
+      fetch(`/api/seat_status_raw/${cameraId}`)
+        .then(res => res.json())
+        .then(data => {
+          const seatsDiv = document.getElementById('seats');
+          seatsDiv.innerHTML = "";
+          const alertBox = document.getElementById("timeout-alert");
+          let alertShown = false;
 
-        // 添加排号标签
-        const rowLabel = document.createElement('div');
-        rowLabel.className = 'row-label';
-        rowLabel.textContent = `第 ${row} 排`;
-        rowLabel.style.width = '100%';
-        rowLabel.style.textAlign = 'center';
-        rowLabel.style.marginBottom = '5px'; // 减小标签下边距
-        rowLabel.style.fontWeight = 'bold';
-        rowLabel.style.fontSize = '1.1em'; // 减小字体大小
-        mainContainer.appendChild(rowLabel);
+          const sortedRows = Object.entries(data).sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
+          const mainContainer = document.createElement('div');
+          mainContainer.style.display = 'flex';
+          mainContainer.style.flexDirection = 'column';
+          mainContainer.style.alignItems = 'center';
+          mainContainer.style.width = '100%';
 
-        // 按x坐标从左到右排序座位
-        seatList.sort((s1, s2) => s1.coords[0] - s2.coords[0]);
+          sortedRows.forEach(([row, seatList]) => {
+            const rowContainer = document.createElement('div');
+            rowContainer.className = 'row-container';
+            rowContainer.style.display = 'flex';
+            rowContainer.style.flexWrap = 'wrap';
+            rowContainer.style.justifyContent = 'center';
+            rowContainer.style.marginBottom = '10px';
+            rowContainer.style.width = '100%';
 
-        seatList.forEach((seat, idx) => {
-          const seatDiv = document.createElement('div');
-          seatDiv.className = `seat ${seat.status}`;
-          seatDiv.textContent = `R${row}_S${idx + 1}`;
+            const rowLabel = document.createElement('div');
+            rowLabel.className = 'row-label';
+            rowLabel.textContent = `第 ${row} 排`;
+            rowLabel.style.width = '100%';
+            rowLabel.style.textAlign = 'center';
+            rowLabel.style.marginBottom = '5px';
+            rowLabel.style.fontWeight = 'bold';
+            rowLabel.style.fontSize = '1.1em';
+            mainContainer.appendChild(rowLabel);
 
-          // 添加基本样式（已通过CSS设置尺寸）
-          seatDiv.style.margin = '3px'; // 减小座位间距
-          seatDiv.style.padding = '5px'; // 减小内边距
-          seatDiv.style.cursor = 'pointer';
-          seatDiv.style.transition = 'transform 0.2s';
-          seatDiv.style.display = 'flex';
-          seatDiv.style.alignItems = 'center';
-          seatDiv.style.justifyContent = 'center';
-          seatDiv.style.textAlign = 'center';
+            seatList.sort((s1, s2) => s1.coords[0] - s2.coords[0]);
 
-          // 悬停效果
-          seatDiv.addEventListener('mouseenter', () => {
-            seatDiv.style.transform = 'scale(1.05)';
+            seatList.forEach((seat, idx) => {
+              const seatId = `R${row}_S${idx + 1}`;
+              const prev = previousSeatStates[seatId];
+              const now = seat.status;
+              if (prev === 'item_only' && now === 'empty') {
+                alertShown = true;
+              }
+              previousSeatStates[seatId] = now;
+
+              const seatDiv = document.createElement('div');
+              seatDiv.className = `seat ${now}`;
+              seatDiv.textContent = seatId;
+              seatDiv.style.margin = '3px';
+              seatDiv.style.padding = '5px';
+              seatDiv.style.cursor = 'pointer';
+              seatDiv.style.transition = 'transform 0.2s';
+              seatDiv.style.display = 'flex';
+              seatDiv.style.alignItems = 'center';
+              seatDiv.style.justifyContent = 'center';
+              seatDiv.style.textAlign = 'center';
+
+              seatDiv.addEventListener('mouseenter', () => {
+                seatDiv.style.transform = 'scale(1.05)';
+              });
+              seatDiv.addEventListener('mouseleave', () => {
+                seatDiv.style.transform = 'scale(1)';
+              });
+
+              rowContainer.appendChild(seatDiv);
+            });
+
+            mainContainer.appendChild(rowContainer);
           });
 
-          seatDiv.addEventListener('mouseleave', () => {
-            seatDiv.style.transform = 'scale(1)';
-          });
+          seatsDiv.appendChild(mainContainer);
 
-          rowContainer.appendChild(seatDiv);
+          if (alertShown) {
+            alertBox.style.display = "block";
+            setTimeout(() => {
+              alertBox.style.display = "none";
+            }, 3000);
+          }
         });
+    }
 
-        mainContainer.appendChild(rowContainer);
-      });
-
-      seatsDiv.appendChild(mainContainer);
-    });
-}
-
-// 页面加载立即执行一次
-loadSeatStatus();
-
-// 每 2 秒刷新一次
-setInterval(loadSeatStatus, 2000);
-</script>
-
+    loadSeatStatus();
+    setInterval(loadSeatStatus, 2000);
+  </script>
 </body>
 </html>

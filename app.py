@@ -18,7 +18,7 @@ CACHE_UPDATE_INTERVAL = 600  # 秒
 
 OCCUPANCY_LOG_FILE = 'occupancy_log.csv'
 
-status_path = "seat_status_on_video.json"
+status_path = "seat_status_on_camera.json"
 
 def update_seat_status():
     global seat_status
