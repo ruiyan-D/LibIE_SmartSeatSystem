@@ -153,7 +153,11 @@ const roomToCamera = {
   "2": "camera_1",
   "3": "camera_2"
 };
-
+const cameraToRoom = {
+  "camera_0":  "101",
+  "camera_1":  "102",
+  "camera_2":  "203"
+};
 const params = new URLSearchParams(location.search);
 const room = params.get("room");
 const cameraId = roomToCamera[room];
