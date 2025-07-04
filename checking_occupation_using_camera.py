@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 item_only_timers = {}  # 记录物品占座的时间
 item_only_expired = set()  # 记录物品超时的座位
-ITEM_ONLY_TIMEOUT = timedelta(seconds=10)
+ITEM_ONLY_TIMEOUT = timedelta(seconds=10)#超时时间设置，seconds表示秒，minutes表示分，hours表示小时，days表示天
 
 model = YOLO('yolov8n.pt')
 PERSON_CLASS = 0
