@@ -63,12 +63,7 @@
     }
   </style>
   <script>
-    const cameraToRoom = {
-  "0": "101",
-  "1": "102",
-  "2": "203"
-};
-const roomName = cameraToRoom[room_id];
+
 
   function getColor(rate) {
     // 0% 白色，100% 红色
@@ -103,7 +98,7 @@ const roomName = cameraToRoom[room_id];
 
   <div class="main">
     <div class="card">
-      <h2>教室 {{ roomName }}</h2>
+      <h2>教室 {{ room_id }}</h2>
       <table>
         <thead>
           <tr>
