@@ -196,5 +196,50 @@ def api_room_heatmap(room_id):
         print("生成热力图数据出错:", e)
         return jsonify({'occupancy_matrix': [[0]*7 for _ in range(16)]})
 
+@app.route('/api/available_seats')
+def api_available_seats():
+    camera_to_room = {
+        'camera_0': '101',
+        'camera_1': '102',
+        'camera_2': '203'
+    }
+    latest_rows = {}
+    try:
+        with open('occupancy_log.csv', 'r', encoding='utf-8') as f:
+            reader = list(csv.DictReader(f))
+            # 逆序遍历，找到每个camera的最新一条
+            for row in reversed(reader):
+                cam = row['camera_id']
+                if cam not in latest_rows:
+                    latest_rows[cam] = row
+                if len(latest_rows) == len(camera_to_room):
+                    break
+        result = []
+        for cam, room_name in camera_to_room.items():
+            if cam in latest_rows:
+                row = latest_rows[cam]
+                total = int(row['total_seats'])
+                occupied = int(row['occupied'])
+                item_only = int(row['item_only'])
+                free = total - occupied - item_only
+                percent = round((free / total) * 100, 2) if total > 0 else 0
+                result.append({
+                    'room_id': cam,
+                    'room_name': room_name,
+                    'free_seats': free,
+                    'total_seats': total,
+                    'free_percent': percent
+                })
+        # 按空闲座位数降序排列
+        result.sort(key=lambda x: x['free_seats'], reverse=True)
+        return jsonify(result)
+    except Exception as e:
+        print('available_seats接口出错:', e)
+        return jsonify([])
+
+@app.route('/available_seats.html')
+def available_seats_page():
+    return render_template('available_seats.html')
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

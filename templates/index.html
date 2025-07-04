@@ -14,7 +14,7 @@
         <div class="dropdown">
           <button class="dropbtn">优先级 ⮟</button>
           <div class="dropdown-content">
-            <div class="dropdown-item" onclick="selectPriority('available')">✅ 有座</div>
+            <div class="dropdown-item" onclick="window.location.href='/available_seats.html'">✅ 有座</div>
             <div class="dropdown-item" onclick="selectPriority('quiet')">🔇 无声</div>
             <div class="dropdown-item submenu">
               🔥 热门区域 ▶
@@ -46,7 +46,7 @@
       <div class="room">
         <a href="room.html?room=1" class="room-number">101</a>
         <div class="room-info">
-          <span class="room-detail" id="room-101-detail">容量: 3/45 | 安静</span>
+          <span class="room-detail" id="room-101-detail">容量: --/-- | --</span>
           <a class="time-link" href="/hot-times/0" style="font-size: 16px;">查看热门时段</a>
         </div>
       </div>
@@ -55,7 +55,7 @@
       <div class="room">
         <a href="room.html?room=2" class="room-number">102</a>
         <div class="room-info">
-          <span class="room-detail" id="room-102-detail">容量: 1/40 | 嘈杂</span>
+          <span class="room-detail" id="room-102-detail">容量: --/-- | --</span>
           <a class="time-link" href="/hot-times/1" style="font-size: 16px;">查看热门时段</a>
         </div>
       </div>
@@ -64,7 +64,7 @@
       <div class="room">
         <a href="room.html?room=3" class="room-number">203</a>
         <div class="room-info">
-          <span class="room-detail" id="room-203-detail">容量: 38/40 | 嘈杂</span>
+          <span class="room-detail" id="room-203-detail">容量: --/-- | --</span>
           <a class="time-link" href="/hot-times/2" style="font-size: 16px;">查看热门时段</a>
         </div>
       </div>
@@ -72,5 +72,17 @@
   </main>
 
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script>
+  fetch('/api/available_seats').then(res=>res.json()).then(data=>{
+    data.forEach(item => {
+
+      // 填充到对应教室
+      const detail = document.getElementById(`room-${item.room_name}-detail`);
+      if(detail) {
+        detail.textContent = `容量: ${item.free_seats}/${item.total_seats} | 空闲`;
+      }
+    });
+  });
+  </script>
 </body>
 </html>
