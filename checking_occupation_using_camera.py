@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 item_only_timers = {}  # 记录物品占座的时间
 item_only_expired = set()  # 记录物品超时的座位
-ITEM_ONLY_TIMEOUT = timedelta(seconds=10)#超时时间设置，seconds表示秒，minutes表示分，hours表示小时，days表示天
+ITEM_ONLY_TIMEOUT = timedelta(seconds=10)
 
 model = YOLO('yolov8n.pt')
 PERSON_CLASS = 0
@@ -166,25 +166,27 @@ while True:
                     color = (0, 0, 255)
                     item_only_timers.pop(seat_key, None)
                     item_only_expired.discard(seat_key)
-                elif seat_key in item_only_expired:
-                    status = "empty"
-                    color = (0, 255, 0)
                 elif has_item:
                     if seat_key not in item_only_timers:
                         item_only_timers[seat_key] = now
                     elapsed = now - item_only_timers[seat_key]
                     if elapsed >= ITEM_ONLY_TIMEOUT:
-                        status = "empty"
-                        color = (0, 255, 0)
+                        status = "item_expired"
+                        color = (0, 255, 255)  # yellow
                         item_only_expired.add(seat_key)
-                        item_only_timers.pop(seat_key, None)
                     else:
                         status = "item_only"
-                        color = (0, 165, 255)
+                        color = (0, 165, 255)  # orange
                 else:
-                    status = "empty"
-                    color = (0, 255, 0)
-                    item_only_timers.pop(seat_key, None)
+                    if seat_key in item_only_expired:
+                        status = "empty"
+                        color = (0, 255, 0)
+                        item_only_expired.discard(seat_key)
+                        item_only_timers.pop(seat_key, None)
+                    else:
+                        status = "empty"
+                        color = (0, 255, 0)
+                        item_only_timers.pop(seat_key, None)
 
                 row_seat_status.append({
                     "coords": coords,

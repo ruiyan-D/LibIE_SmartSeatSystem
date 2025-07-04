@@ -116,6 +116,8 @@
     .row-label {
       margin-bottom: 5px !important;
     }
+    .item_expired { background: yellow; }
+
   </style>
 </head>
 <body>
@@ -131,6 +133,8 @@
       <div class="legend">
         <span><span class="color-box" style="background: green;"></span> 空闲</span>
         <span><span class="color-box" style="background: red;"></span> 占用</span>
+        <span><span class="color-box" style="background: yellow;"></span> 占座超时等待清理</span>
+
         <span><span class="color-box" style="background: orange;"></span> 物品占座</span>
       </div>
 
@@ -146,7 +150,7 @@
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(195, 255, 0, 0.9);
+    background: rgba(215, 218, 27, 0.9);
     color: white;
     padding: 12px 20px;
     border-radius: 8px;
@@ -212,9 +216,10 @@
               const seatId = `R${row}_S${idx + 1}`;
               const prev = previousSeatStates[seatId];
               const now = seat.status;
-              if (prev === 'item_only' && now === 'empty') {
-                alertShown = true;
-              }
+            if (prev === 'item_only' && now === 'item_expired') {
+    alertShown = true;
+}
+
               previousSeatStates[seatId] = now;
 
               const seatDiv = document.createElement('div');
