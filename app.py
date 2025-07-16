@@ -101,7 +101,9 @@ def noise_monitor_classroom(classroom, device):
         with noise_lock:
             multi_noise_status[classroom]['status'] = status_str
             multi_noise_status[classroom]['db'] = float(db)
+            multi_noise_status[classroom]['last_update'] = time_module.time()  # 记录更新时间
         print(f"{classroom} 当前分贝: {db:.2f}，状态: {status_str}")
+    import time as time_module
     with sd.InputStream(callback=callback, channels=1, samplerate=44100, blocksize=1024, device=device):
         while True:
             sd.sleep(1000)
@@ -234,11 +236,21 @@ def api_room_heatmap(room_id):
 def get_noise_status():
     try:
         with noise_lock:
-            # 返回所有教室的噪声状态
+            now = time.time()
+            result = {}
+            for classroom, info in multi_noise_status.items():
+                # 默认安静
+                status = info.get('status', '安静')
+                db = info.get('db', 0.0)
+                last_update = info.get('last_update', now)
+                # 如果超时（如30秒没更新），也强制显示“安静”
+                if now - last_update > 30:
+                    status = '安静'
+                result[classroom] = {'status': status, 'db': db, 'last_update': last_update}
             return jsonify({
                 'status': 'success',
-                'data': multi_noise_status,
-                'timestamp': time.time()
+                'data': result,
+                'timestamp': now
             })
     except Exception as e:
         print(f"获取噪音状态出错: {str(e)}")

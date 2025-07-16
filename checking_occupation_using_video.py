@@ -4,6 +4,7 @@ import time
 import numpy as np
 import threading
 from ultralytics import YOLO
+from typing import Optional
 
 # 初始化YOLO模型
 model = YOLO('yolov8l.pt')
@@ -47,7 +48,7 @@ if not caps:
 # 全局变量
 seat_status = {}
 seat_status_lock = threading.Lock()
-latest_frames = {cam_id: None for cam_id in camera_ids}
+latest_frames: dict[str, Optional[np.ndarray]] = {cam_id: None for cam_id in camera_ids}
 frame_locks = {cam_id: threading.Lock() for cam_id in camera_ids}
 stop_threads = False
 
@@ -92,8 +93,9 @@ def capture_thread(cam_id, video_path):
         if not ret:
             cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
             continue
-        with frame_locks[cam_id]:
-            latest_frames[cam_id] = frame.copy()
+        if frame is not None:
+            with frame_locks[cam_id]:
+                latest_frames[cam_id] = frame.copy()
         time.sleep(1 / 30)
 
 # 启动线程

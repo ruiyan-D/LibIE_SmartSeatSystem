@@ -46,6 +46,8 @@ def draw_rectangle(event, x, y, flags, param):
         ix, iy = x, y
 
     elif event == cv2.EVENT_MOUSEMOVE and drawing:
+        if frame is None:
+            return
         temp = frame.copy()
         cv2.rectangle(temp, (ix, iy), (x, y), (0, 255, 0), 2)
         for r in rectangles:
@@ -117,6 +119,8 @@ def main():
         return
 
     while True:
+        if frame is None:
+            continue
         display = frame.copy()
         for r in rectangles:
             color = ROW_COLORS[(r[4] - 1) % len(ROW_COLORS)]
