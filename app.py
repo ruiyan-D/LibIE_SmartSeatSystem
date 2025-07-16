@@ -149,6 +149,7 @@ def api_summary():
             }
         return jsonify(summary)
 @app.route('/hot-times/<room_id>')
+
 def hot_times(room_id):
     # 模拟 16 段 × 7 天（周一至周日）的颜色矩阵（用于热力图）
     # 颜色深浅代表人数多少，白色表示无人，越红表示越多人
