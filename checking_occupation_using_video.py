@@ -6,7 +6,7 @@ import threading
 from ultralytics import YOLO
 
 # 初始化YOLO模型
-model = YOLO('yolov8l.pt')
+model = YOLO('yolov8n.pt')
 PERSON_CLASS = 0
 ITEM_CLASSES = {
     24: "backpack", 26: "handbag", 28: "suitcase", 39: "bottle",
